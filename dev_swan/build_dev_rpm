@@ -17,7 +17,9 @@
 # 相关配置项   #############
 ############################
 CUR_PWD=`pwd`
-PATH_OPT=/usr/local/dev_swan/opt
+PATH_DEV_SWAN=/usr/local/dev_swan
+PATH_OPT=$PATH_DEV_SWAN/opt
+PATH_WEB=$PATH_DEV_SWAN/web
 PATH_TMP_CODE=/usr/local/tmp_dev_swan_git
 PATH_OPT_MAKE=$PATH_TMP_CODE/opt/etc
 
@@ -95,15 +97,18 @@ function sw_configure()
 
 # }}}
 ###############################
-#copy opt code to /tmp        #
+#copy opt , web code to /tmp        #
 ###############################
 # {{{ function sw_copy_opt()
 
 function sw_copy_opt()
 {
-	echo "copt opt to $BUILD_BALL ..."
+	echo "copt opt, web to $BUILD_BALL ..."
 	echo "cp -r $PATH_OPT/* $BUILD_BALL/opt ..."
 	cp -r $PATH_OPT/* $BUILD_BALL/opt
+	check_return_exit
+	echo "cp -r $PATH_WEB/* $BUILD_BALL/web ..."
+	cp -r $PATH_WEB $BUILD_BALL/web/
 	check_return_exit
 }
 
