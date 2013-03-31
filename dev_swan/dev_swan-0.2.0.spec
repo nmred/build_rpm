@@ -62,16 +62,16 @@ echo -n "Stop SWANSOFT ... "
 %{prefix}/tmp_install/sbin/stop_swansoft
 echo "OK"
 # backup cron config
-mv /etc/cron.d/swan_soft /usr/local/swan/opt/etc/sw_cron.crond.backup > /dev/null 2>&1
+mv /etc/cron.d/dev_swan /usr/local/dev_swan/opt/etc/sw_cron.crond.backup > /dev/null 2>&1
 # del initd
-/sbin/chkconfig --del swan_soft > /dev/null 2>&1
+/sbin/chkconfig --del dev_swan > /dev/null 2>&1
 # backup old version
 SW_TMP_BAK_PATH=%{prefix}-backup-$(date +%%Y%%m%%d-%%H%%M%%S)
 mv %{prefix} $SW_TMP_BAK_PATH
 echo "Old version '%{prefix}' backup to '$SW_TMP_BAK_PATH'"
 %postun
-rm -f /etc/init.d/swan_soft /usr/bin/swan_soft
-rm -f /etc/cron.d/swan_soft
+rm -f /etc/init.d/dev_swan /usr/bin/dev_swan
+rm -f /etc/cron.d/dev_swan
 %files
 %{prefix}
 
