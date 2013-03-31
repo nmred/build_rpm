@@ -21,7 +21,10 @@ TMP_DIR="/tmp/dev_swan/"
 OPENSOURCE="/usr/local/swan_open/"
 
 #将 环境编译到临时目录中
-INSTALL_DIR="/usr/local/dev_swan/opt"
+SWAN_ROOT="/usr/local/dev_swan"
+INSTALL_DIR="$SWAN_ROOT/opt"
+SWAN_LOG="$SWAN_ROOT/log"
+SWAN_DATA="$SWAN_ROOT/data"
 
 ############################
 #          函数        #####
@@ -134,6 +137,7 @@ function sw_pre_install()
 sw_pre_install
 
 # 软件的源文件
+SRC_RRDTOOL="$TMP_DIR/`ls $TMP_DIR |grep rrdtool`"
 SRC_HTTPD="$TMP_DIR/`ls $TMP_DIR |grep httpd`"
 SRC_PCRE="$TMP_DIR/`ls $TMP_DIR |grep pcre`"
 SRC_APR="$TMP_DIR/`ls  $TMP_DIR|grep apr-[0-9].*`"
@@ -147,6 +151,7 @@ SRC_ZLIB="$TMP_DIR/`ls $TMP_DIR |grep zlib`"
 SRC_GD="$TMP_DIR/`ls $TMP_DIR |grep gd`"
 SRC_LIBXML="$TMP_DIR/`ls $TMP_DIR |grep libxml`"
 SRC_PTHREADS="$TMP_DIR/`ls $TMP_DIR |grep pthreads`"
+SRC_SNMP="$TMP_DIR/`ls $TMP_DIR |grep net-snmp`"
 
 INSTALL_HTTPD="$INSTALL_DIR/apache2"
 INSTALL_APR="$SRC_HTTPD/srclib/apr"
@@ -161,7 +166,9 @@ INSTALL_ZLIB="$INSTALL_PHP/zlib"
 INSTALL_GD="$INSTALL_PHP/gd"
 INSTALL_LIBXML="$INSTALL_PHP/libxml"
 INSTALL_EXT="$INSTALL_PHP/ext"
+INSTALL_SNMP="$INSTALL_DIR/snmp"
 ETC_DIR="$INSTALL_DIR/etc"
+RRDTOOL="$INSTALL_DIR/rrdtool"
 MYSQL_DATA="$INSTALL_DIR/data/mysql"
 INATLL_LOG="$INSTALL_DIR/install.log"
 
@@ -295,6 +302,36 @@ function install_mysql()
 	check_return_exit
 	rm -rf $INSTALL_MYSQL/lib/plugin/libdaemon_example*
 	check_return_exit
+}
+
+# }}}
+# }}}
+# {{{ install snmp
+# {{{ function install_snmp()
+
+############################
+# 安装 snmp    #############
+############################
+function install_snmp()
+{
+	echo "start install snmp ..."
+	cd $SRC_SNMP
+	check_return_exit
+	CMD="./configure --prefix=$INSTALL_SNMP \
+	 --enable-mfd-rewrites --with-default-snmp-version="2" \
+	 --with-sys-contact=nmred_2008@126.com \
+	 --with-sys-location=China \
+	 --with-logfile=$SWAN_LOG/snmpd.log \
+	 --enable-developer \
+	 --with-persistent-directory=$SWAN_DATA/snmp \
+	 "
+	 echo $CMD;
+	 eval $CMD;
+	 check_return_exit
+	 echo "start make snmp..."
+	 make && make install
+	 check_return_exit
+	 echo "install snmp success..."
 }
 
 # }}}
@@ -496,6 +533,7 @@ function install_php()
 {
 	echo "start install php ...."
 	echo "perpare install php ..."
+	install_snmp
 	pre_install_ext
 	install_jpeg
 	install_png
@@ -529,6 +567,7 @@ function install_php()
 		--with-libxml-dir=$INSTALL_LIBXML \
 		--enable-soap \
 		--with-gd=$INSTALL_GD \
+		--with-snmp=$INSTALL_SNMP \
 		--with-jpeg-dir=$INSTALL_JPEG \
 		--with-zlib-dir=$INSTALL_ZLIB \
 		--with-png-dir=$INSTALL_LIBPNG \

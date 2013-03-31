@@ -171,7 +171,6 @@ INSTALL_SNMP="$INSTALL_DIR/snmp"
 ETC_DIR="$INSTALL_DIR/etc"
 MYSQL_DATA="$INSTALL_DIR/data/mysql"
 RRDTOOL="$INSTALL_DIR/rrdtool"
-RRDTOOL="$INSTALL_DIR/rrdtool"
 INATLL_LOG="$INSTALL_DIR/install.log"
 
 ############################
