@@ -1,6 +1,6 @@
-Summary:dev for swansoft beta
+Summary:dev_swan beta
 Name:dev_swan
-Version:0.2.0
+Version:0.3.0
 Release:beta
 Group:Development/Tools
 License:BSD
@@ -32,7 +32,7 @@ else
 fi
 if test -d %{prefix}; then
 	echo ""
-	echo "Install dir \'%{prefix}\' exists. You need resolve it manually before install swansoft. Exit now."
+	echo "Install dir \'%{prefix}\' exists. You need resolve it manually before install dev_swan. Exit now."
 	echo ""
 # return !0 for exit.
 	test ""
@@ -57,8 +57,8 @@ else
 	echo -e "Build: [0;31mFAIL[0m"
 fi
 %preun
-# stop swan_soft
-echo -n "Stop SWANSOFT ... "
+# stop dev_swan
+echo -n "Stop DEV_SWAN ... "
 %{prefix}/tmp_install/sbin/stop_swansoft
 echo "OK"
 # backup cron config
@@ -78,4 +78,12 @@ rm -f /etc/cron.d/dev_swan
 %changelog
 *Fri Mar 29 2013 SWANTEAM <NMRED_2008@126.COM>
 
-+ 修正开发环境中php没有pdo-mysql相关的模块的bug
++ 修正开发环境中 php 没有 pdo-mysql 相关的模块的 bug
+
+*Sat Jul 06 2013 SWANTEAM <NMRED_2008@126.COM>
+
++ 扩展了通过 xml 生成 sql 语句的类库
++ 增加 FTP 上传的类库 
++ 增加 xdebug 扩展
++ 增加 phpunit 工具
+
