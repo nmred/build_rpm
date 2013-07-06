@@ -81,7 +81,7 @@ class build_tar
 	 */
 	protected function _get_output_dir()
 	{
-		$dir_name = '/tmp/dev_swan-0.2.0/';
+		$dir_name = '/tmp/dev_swan-0.3.0/';
 
 		return $dir_name;
 	}

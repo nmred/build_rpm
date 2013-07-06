@@ -76,14 +76,13 @@ rm -f /etc/cron.d/dev_swan
 %{prefix}
 
 %changelog
-*Fri Mar 29 2013 SWANTEAM <NMRED_2008@126.COM>
 
-+ 修正开发环境中 php 没有 pdo-mysql 相关的模块的 bug
-
-*Sat Jul 06 2013 SWANTEAM <NMRED_2008@126.COM>
-
+* Sat Jul 06 2013 SWANTEAM <NMRED_2008@126.COM>
 + 扩展了通过 xml 生成 sql 语句的类库
 + 增加 FTP 上传的类库 
 + 增加 xdebug 扩展
 + 增加 phpunit 工具
+
+* Fri Mar 29 2013 SWANTEAM <NMRED_2008@126.COM>
++ 修正开发环境中 php 没有 pdo-mysql 相关的模块的 bug
 
