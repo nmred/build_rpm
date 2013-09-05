@@ -401,8 +401,8 @@ EOD;
 	protected function _set_changelog()
 	{
 		$change_str = file_get_contents('build_rpm.log');
-		$pattern = '/====(\d{4})-(\d{2})-(\d{2})====/eiU';
-		$replace = "'* ' . date('D M d Y', mktime(0, 0, 0, \\2, \\3, \\1)) . ' ' . strtoupper(SWANBR_AUTHOR)";
+		$pattern = '/====\s(\d{4})-(\d{2})-(\d{2})\s====/eiU';
+		$replace = "'* ' . date('D M d Y', mktime(0, 0, 0, (int)trim('\\2', '0'), (int)trim('\\3', '0'), \\1)) . ' ' . strtoupper(SWANBR_AUTHOR)";
 		return preg_replace($pattern, $replace, $change_str);
 	}
 

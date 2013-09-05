@@ -32,10 +32,10 @@ define('SWAN_ROOT', '/usr/local/dev_swan/');
 define('SWAN_SOFTNAME', 'dev_swan');
 
 // 软件版本号
-define('SWAN_VERSION', '0.3.0');
+define('SWAN_VERSION', '0.3.1');
 
 // 软件发行号
-define('SWANBR_RELEASE', 'beta');
+define('SWANBR_RELEASE', 'realse');
 
 //软件宣言 ------一切为了方便
 define('SWANBR_SLOGAN', 'Everything in order to facilitate');

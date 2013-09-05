@@ -16,6 +16,7 @@
 ############################
 # 相关配置项   #############
 ############################
+CPU_NUM="4"
 CUR_PWD="`pwd`"
 TMP_DIR="/tmp/dev_swan/"
 OPENSOURCE="/usr/local/swan_open/"
@@ -50,15 +51,15 @@ function sw_mkdir()
 {
 	echo "create $1 directory ...";
 	if [ -d $1 ] ;then
-		echo "directory $1 already exists. " 
+		echo "directory $1 already exists. "
 	else
 		mkdir -p $1
 		check_return_exit
 	fi
 }
 
-# }}} 
-# {{{ function sw_tar_all() 
+# }}}
+# {{{ function sw_tar_all()
 
 ############################
 # 通过tar解压文件 ##########
@@ -75,7 +76,7 @@ function sw_tar_all()
 		echo "start extract  $file ...";
 		tar -zxf $OPENSOURCE$file -C $TMP_DIR
 		check_return_exit
-	done	
+	done
 }
 
  # }}}
@@ -96,7 +97,7 @@ function sw_unzip_all()
 		echo "start unzip $file ..."
 		unzip $OPENSOURCE$file -d $TMP_DIR >/dev/null 2>&1
 		check_return_exit
-	done	
+	done
 }
 
  # }}}
@@ -119,7 +120,7 @@ function sw_pre_install()
 		check_return_exit
 	fi
 	echo "build install directory | extract soucre file ..."
-		
+
 	#创建安装目录
 	sw_mkdir $INSTALL_DIR
 	sw_mkdir $INSTALL_HTTPD
@@ -143,15 +144,26 @@ SRC_PCRE="$TMP_DIR/`ls $TMP_DIR |grep pcre`"
 SRC_APR="$TMP_DIR/`ls  $TMP_DIR|grep apr-[0-9].*`"
 SRC_APR_UTIL="$TMP_DIR/`ls $TMP_DIR|grep apr-util`"
 SRC_MYSQL="$TMP_DIR/`ls $TMP_DIR |grep mysql`"
+SRC_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.8`"
 SRC_PHP="$TMP_DIR/`ls $TMP_DIR |grep php`"
 SRC_JPEG="$TMP_DIR/`ls $TMP_DIR |grep jpeg`"
 SRC_LIBPNG="$TMP_DIR/`ls $TMP_DIR |grep libpng`"
 SRC_FREETYPE="$TMP_DIR/`ls $TMP_DIR |grep freetype`"
 SRC_ZLIB="$TMP_DIR/`ls $TMP_DIR |grep zlib`"
-SRC_GD="$TMP_DIR/`ls $TMP_DIR |grep gd`"
+SRC_GD="$TMP_DIR/`ls $TMP_DIR |grep libgd`"
 SRC_LIBXML="$TMP_DIR/`ls $TMP_DIR |grep libxml`"
+SRC_LIBXSLT="$TMP_DIR/`ls $TMP_DIR |grep libxslt`"
+SRC_LIBEVENT="$TMP_DIR/`ls $TMP_DIR |grep libevent`"
+SRC_ZMQ="$TMP_DIR/`ls $TMP_DIR |grep zeromq`"
 SRC_PTHREADS="$TMP_DIR/`ls $TMP_DIR |grep pthreads`"
+SRC_EVENTS="$TMP_DIR/`ls $TMP_DIR |grep event`"
+SRC_PHP_ZMQ="$TMP_DIR/`ls $TMP_DIR |grep php-zmq`"
+SRC_EIO="$TMP_DIR/`ls $TMP_DIR |grep eio`"
+SRC_IMAGICK="$TMP_DIR/`ls $TMP_DIR |grep imagick`"
+SRC_XDEBUG="$TMP_DIR/`ls $TMP_DIR |grep xdebug`"
+SRC_PHP_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.2`"
 SRC_SNMP="$TMP_DIR/`ls $TMP_DIR |grep net-snmp`"
+SRC_IMAGEMAGICK="$TMP_DIR/`ls $TMP_DIR |grep ImageMagick`"
 
 INSTALL_HTTPD="$INSTALL_DIR/apache2"
 INSTALL_APR="$SRC_HTTPD/srclib/apr"
@@ -159,18 +171,25 @@ INSTALL_APR_UTIL="$SRC_HTTPD/srclib/apr-util"
 INSTALL_PCRE="$INSTALL_HTTPD/pcre"
 INSTALL_PHP="$INSTALL_DIR/php"
 INSTALL_MYSQL="$INSTALL_DIR/mysql"
+INSTALL_REDIS="$INSTALL_DIR/redis"
 INSTALL_JPEG="$INSTALL_PHP/jpeg"
-INSTALL_LIBPNG="/usr/local/libpng"
+INSTALL_LIBPNG="$INSTALL_PHP/libpng"
 INSTALL_FREETYPE="$INSTALL_PHP/freetype"
 INSTALL_ZLIB="$INSTALL_PHP/zlib"
 INSTALL_GD="$INSTALL_PHP/gd"
 INSTALL_LIBXML="$INSTALL_PHP/libxml"
+INSTALL_LIBXSLT="$INSTALL_PHP/libxslt"
+INSTALL_LIBEVENT="$INSTALL_PHP/libevent"
+INSTALL_ZMQ="$INSTALL_PHP/zmq"
 INSTALL_EXT="$INSTALL_PHP/ext"
 INSTALL_SNMP="$INSTALL_DIR/snmp"
+INSTALL_IMAGEMAGICK="$INSTALL_PHP/imagemagick"
 ETC_DIR="$INSTALL_DIR/etc"
 RRDTOOL="$INSTALL_DIR/rrdtool"
 MYSQL_DATA="$INSTALL_DIR/data/mysql"
 INATLL_LOG="$INSTALL_DIR/install.log"
+
+FIXED_BUG_DIR="$CUR_PWD/fixed_bug"
 
 ############################
 # 必要检查函数库       #####
@@ -183,7 +202,7 @@ function check_libtool()
 	if [ "$is_exists" -lt "1" ];then
 		echo "libtool not install . [FAIL]"
 		exit 1
-	fi		
+	fi
 }
 
 # }}}
@@ -195,7 +214,7 @@ function check_gccadd()
 	if [ "$is_exists" -lt "1" ];then
 		echo "gcc-c++ not install . [FAIL]"
 		exit 1
-	fi		
+	fi
 }
 
 # }}}
@@ -226,11 +245,11 @@ function install_httpd()
 	eval $CMD
 
 	echo "make pcre start ..."
-	make
+	make -j $CPU_NUM
 	check_return_exit
-	make install 
+	make install
 	check_return_exit
-	
+
 	cd $CUR_PWD
 	# }}}
 	# {{{导入apr和apr-utli依赖包
@@ -274,9 +293,9 @@ function install_httpd()
 	echo $CMD
 	eval $CMD
 	check_return_exit
-	
+
 	echo "make httpd start ..."
-	make && make install
+	make -j $CPU_NUM && make install
 	check_return_exit
 	# }}}
 }
@@ -329,7 +348,7 @@ function install_snmp()
 	 eval $CMD;
 	 check_return_exit
 	 echo "start make snmp..."
-	 make && make install
+	 make -j $CPU_NUM && make install
 	 check_return_exit
 	 echo "install snmp success..."
 }
@@ -337,15 +356,15 @@ function install_snmp()
 # }}}
 # }}}
 # {{{ install php
-# {{{ function pre_install_ext()
+# {{{ function pre_install_php()
 
 ############################
 # 静态编译扩展预处理 #######
 ############################
-function pre_install_ext()
+function pre_install_php()
 {
 	#处理pthreads扩展
-	sw_mkdir $INSTALL_EXT/pthreads	
+	sw_mkdir $INSTALL_EXT/pthreads
 	echo "start install php-ext pthreads ..."
 	cp -r $SRC_PTHREADS $INSTALL_EXT
 	check_return_exit
@@ -360,14 +379,14 @@ function pre_install_ext()
 function install_jpeg()
 {
 	#创建目录
-	sw_mkdir $INSTALL_JPEG	
+	sw_mkdir $INSTALL_JPEG
 	sw_mkdir $INSTALL_JPEG/bin
 	sw_mkdir $INSTALL_JPEG/lib
 	sw_mkdir $INSTALL_JPEG/include
 	sw_mkdir $INSTALL_JPEG/man
 	sw_mkdir $INSTALL_JPEG/man1
 	sw_mkdir $INSTALL_JPEG/man/man1
-	
+
 	echo "cd $SRC_JPEG ..."
 	cd $SRC_JPEG
 	check_return_exit
@@ -382,7 +401,7 @@ function install_jpeg()
 	eval $CMD
 
 	echo "start make && make install jpeg ..."
-	make && make install
+	make -j $CPU_NUM && make install
 	check_return_exit
 }
 
@@ -398,11 +417,7 @@ function install_png()
 	cd $SRC_LIBPNG
 	check_return_exit
 
-	#配置
-	echo "cp scripts/makefile.std makefile ..."
-	cp scripts/makefile.std makefile
-	check_return_exit
-	
+	sw_mkdir $INSTALL_LIBPNG
 	echo "start configure libpng ..."
 	CMD="./configure --prefix=$INSTALL_LIBPNG"
 	echo $CMD
@@ -410,7 +425,7 @@ function install_png()
 	check_return_exit
 
 	echo "start make && make install libpng ..."
-	make && make install
+	make -j $CPU_NUM && make install
 	check_return_exit
 }
 
@@ -423,7 +438,7 @@ function install_png()
 function install_freetype()
 {
 	echo "cd $SRC_FREETYPE ..."
-	cd $SRC_FREETYPE		
+	cd $SRC_FREETYPE
 	check_return_exit
 
 	sw_mkdir $INSTALL_FREETYPE
@@ -435,7 +450,7 @@ function install_freetype()
 	check_return_exit
 
 	echo "start make && make install freetype ..."
-	make &&  make install
+	make -j $CPU_NUM &&  make install
 	check_return_exit
 }
 
@@ -448,7 +463,7 @@ function install_freetype()
 function install_zlib()
 {
 	echo "cd $SRC_ZLIB ..."
-	cd $SRC_ZLIB		
+	cd $SRC_ZLIB
 	check_return_exit
 	sw_mkdir $INSTALL_ZLIB
 
@@ -459,7 +474,7 @@ function install_zlib()
 	check_return_exit
 
 	echo "start make && make install zlib ...."
-	make && make install
+	make -j $CPU_NUM && make install
 	check_return_exit
 }
 
@@ -472,7 +487,7 @@ function install_zlib()
 function install_libxml2()
 {
 	echo "cd $SRC_LIBXML ..."
-	cd $SRC_LIBXML			
+	cd $SRC_LIBXML
 	check_return_exit
 
 	sw_mkdir $INSTALL_LIBXML
@@ -484,7 +499,35 @@ function install_libxml2()
 	check_return_exit
 
 	echo "start make && make install libxml2 ..."
-	make && make install
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_libxslt()
+
+############################
+# 安装 libxslt  ############
+############################
+function install_libxslt()
+{
+	echo "cd $SRC_LIBXSLT ..."
+	cd $SRC_LIBXSLT
+	check_return_exit
+
+	sw_mkdir $INSTALL_LIBXSLT
+
+	echo "start configure libxslt ..."
+	CMD="./configure --prefix=$INSTALL_LIBXSLT \
+			--with-libxml-prefix=$INSTALL_LIBXML \
+			--with-libxml-include-prefix=$INSTALL_LIBXML/include \
+			--with-libxml-libs-prefix=$INSTALL_LIBXML/lib"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install libxslt ..."
+	make -j $CPU_NUM && make install
 	check_return_exit
 }
 
@@ -497,7 +540,7 @@ function install_libxml2()
 function install_gd()
 {
 	echo "cd $SRC_GD ..."
-	cd $SRC_GD			
+	cd $SRC_GD
 	check_return_exit
 
 	sw_mkdir $INSTALL_GD
@@ -509,7 +552,6 @@ function install_gd()
 		--with-png=$INSTALL_LIBPNG \
 		--with-zlib=$INSTALL_ZLIB \
 		--with-freetype=$INSTALL_FREETYPE \
-		--enable-m4_pattern_allow \
 	"
 	echo $CMD
 	eval $CMD
@@ -517,14 +559,98 @@ function install_gd()
 
 	echo "start make && make install gd ..."
 	echo "cd $SRC_GD ..."
-	cd $SRC_GD			
+	cd $SRC_GD
 	check_return_exit
-	make && make install
+	make -j $CPU_NUM && make install
 	check_return_exit
 }
 
 # }}}
-# {{{ function install_php 
+# {{{ function install_imagemagick()
+
+############################
+# 安装 imagemagick 库     #############
+############################
+function install_imagemagick()
+{
+	echo "cd $SRC_IMAGEMAGICK ..."
+	cd $SRC_IMAGEMAGICK
+	check_return_exit
+
+	sw_mkdir $INSTALL_IMAGEMAGICK
+
+	echo "start configure IMAGEMAGICK ..."
+	CMD="
+	./configure --prefix=$INSTALL_IMAGEMAGICK \
+	"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install imagemagick ..."
+	echo "cd $SRC_IMAGEMAGICK ..."
+	cd $SRC_IMAGEMAGICK
+	check_return_exit
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_libevent()
+
+############################
+# 安装libevent  #############
+############################
+function install_libevent()
+{
+	echo "cd $SRC_LIBEVENT ..."
+	cd $SRC_LIBEVENT
+	check_return_exit
+
+	sw_mkdir $INSTALL_LIBEVENT
+
+	echo "start configure libevent ..."
+	CMD="./configure --prefix=$INSTALL_LIBEVENT"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install libzmq ..."
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_zmq()
+
+############################
+# 安装zmq  #############
+############################
+function install_zmq()
+{
+	echo "cd $SRC_ZMQ ..."
+	cd $SRC_ZMQ
+	check_return_exit
+
+	sw_mkdir $INSTALL_ZMQ
+
+	# 删除错误的单元测试文件 test_connect_delay.cpp
+	cp $FIXED_BUG_DIR/zmq/test_connect_delay.cpp $SRC_ZMQ/tests/test_connect_delay.cpp
+	check_return_exit
+
+	echo "start configure zmq ..."
+	CMD="./configure --prefix=$INSTALL_ZMQ"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install libzmq ..."
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_php
 
 ############################
 # 安装php主程序 ############
@@ -533,20 +659,16 @@ function install_php()
 {
 	echo "start install php ...."
 	echo "perpare install php ..."
+	pre_install_php
 	install_snmp
-	pre_install_ext
 	install_jpeg
 	install_png
 	install_freetype
 	install_zlib
 	install_gd
 	install_libxml2
-
-	echo "fixed php bug ..."
-	rm -rf $INSTALL_GD/include/gd_io.h
-	cd $CUR_PWD
-	cp ${OPENSOURCE}gd_io.h $INSTALL_GD/include 
-	check_return_exit
+	install_libxslt
+	install_libevent
 
 	echo "cd $SRC_PHP ..."
 	cd $SRC_PHP
@@ -563,6 +685,7 @@ function install_php()
 		--with-apxs2=$INSTALL_HTTPD/bin/apxs \
 		--enable-ftp \
 		--with-gettext \
+		--enable-shmop \
 		--enable-pcntl \
 		--with-libxml-dir=$INSTALL_LIBXML \
 		--enable-soap \
@@ -574,18 +697,222 @@ function install_php()
 		--with-freetype-dir=$INSTALL_FREETYPE \
 		--enable-mbstring \
 		--enable-sockets \
+		--with-xsl=$INSTALL_LIBXSLT \
+	   --with-openssl \
 	"
 	echo $CMD
 	eval $CMD
 	check_return_exit
 
-	aclocal
-	autoconf
-
 	echo "start make && make install php ..."
-	make && make install
+	make -j $CPU_NUM ZEND_EXTRA_LIBS='-lresolv' && make install
+	check_return_exit
+	post_install_php
+}
+# }}}
+# {{{ function post_install_php()
+
+###############################
+# 编译完成 PHP 动态编译扩展 ###
+###############################
+function post_install_php()
+{
+	echo "Start install ext and pear ..."
+	# 安装 events
+	echo "Start install event...."
+	cd $SRC_EVENTS
+	check_return_exit
+
+	CMD="$INSTALL_PHP/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+			--with-event-libevent-dir=$INSTALL_LIBEVENT \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	# 安装 zmq
+	install_zmq
+
+	echo "Start install zmq...."
+	cd $SRC_PHP_ZMQ
+	check_return_exit
+
+	CMD="$INSTALL_PHP/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+			--with-zmq=$INSTALL_ZMQ \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	#安装 EIO
+	echo "Start install eio...."
+	cd $SRC_EIO
+	check_return_exit
+
+	CMD="$INSTALL_PHP/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	# 安装 xdebug
+	echo "Start install xdebug...."
+	cd $SRC_XDEBUG
+	check_return_exit
+
+	CMD="$INSTALL_PHP/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	# 安装 redis
+	echo "Start install redis ...."
+	cd $SRC_PHP_REDIS
+	check_return_exit
+
+	CMD="$INSTALL_PHP/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	# 安装 ImageMagick
+	install_imagemagick
+	echo "Start install ImageMagick ...."
+	cd $SRC_IMAGICK
+	check_return_exit
+
+	CMD="$INSTALL_PHP/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="ln -s $INSTALL_IMAGEMAGICK/include/ImageMagick-6 $INSTALL_IMAGEMAGICK/include/ImageMagick"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+			--with-imagick=$INSTALL_IMAGEMAGICK \
+			PKG_CONFIG_PATH=$INSTALL_IMAGEMAGICK/lib/pkgconfig/
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+	
+
+	# 安装  pear 相关扩展
+#	install_pear
+}
+
+# }}}
+# {{{ function install_pear()
+
+#########################################
+# 安装pear (为了保证正确，需要手动执行)##
+#########################################
+function install_pear()
+{
+	PHP_BIN_PEAR="$INSTALL_PHP/bin/pear"
+	echo "start install pear ext ..."
+	CMD="$PHP_BIN_PEAR config-set auto_discover 1
+	"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	# 安装 PHPUnit
+	CMD="$PHP_BIN_PEAR install pear.phpunit.de/PHPUnit
+	"	
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	CMD="$PHP_BIN_PEAR install phpunit/DbUnit
+	"
+	echo $CMD
+	eval $CMD
+
+	# 安装 PHP_UML
+	CMD="$PHP_BIN_PEAR install PHP_UML 
+	"
+	echo $CMD
+	eval $CMD
 	check_return_exit
 }
+
+# }}}
+# }}}
+# {{{ install redis
+# {{{ function install_redis()
+
+############################
+# 安装redis    #############
+############################
+function install_redis()
+{
+	echo "start install redis ..."
+	echo "fixed .make-settings..."
+	CMD="cp $FIXED_BUG_DIR/redis/Makefile $SRC_REDIS/src/Makefile"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	sw_mkdir $INSTALL_REDIS
+	echo "make and make install redis..."
+	CMD="cd $SRC_REDIS"
+	echo $CMD
+	eval $CMD
+	CMD="make -j $CPU_NUM && make PREFIX=$INSTALL_REDIS install"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+}
+
 # }}}
 # }}}
 
@@ -606,6 +933,9 @@ function sw_after_install()
 # }}}
 
 case $1 in
+redis)
+	install_redis
+	;;
 mysql)
 #安装mysql
 	install_mysql
@@ -616,7 +946,7 @@ php)
 #安装php
 	install_php
 	;;
-*) 
+*)
 #安装httpd
 	install_httpd
 
@@ -624,6 +954,7 @@ php)
 	install_mysql
 #安装php
 	install_php
+	install_redis
 	exit 0
 	;;
 esac

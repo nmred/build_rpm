@@ -26,7 +26,7 @@ PATH_OPT_MAKE=$PATH_TMP_CODE/opt/etc
 BUILD_ROOT="/home/hzx/rpmbuild"
 GIT_SWANSOFT="/root/code/dev_swan"
 SWANSOFT_NAME="dev_swan"
-SWANSOFT_VERSION="0.3.0"
+SWANSOFT_VERSION="0.3.1"
 BUILD_TMP=/tmp
 BUILD_BALL=$BUILD_TMP/$SWANSOFT_NAME-$SWANSOFT_VERSION
 
@@ -107,9 +107,17 @@ function sw_copy_opt()
 	echo "cp -r $PATH_OPT/* $BUILD_BALL/opt ..."
 	cp -r $PATH_OPT/* $BUILD_BALL/opt
 	check_return_exit
-	echo "cp -r $PATH_WEB/* $BUILD_BALL/web ..."
-	cp -r $PATH_WEB $BUILD_BALL/web/
-	check_return_exit
+
+	# 删除影响打包的文件
+	rm -rf $BUILD_BALL/opt/snmp/share/snmp/mib2c.perl.conf 
+	rm -rf $BUILD_BALL/opt/snmp/bin/snmp-bridge-mib 
+	rm -rf $BUILD_BALL/opt/snmp/bin/mib2c 
+	rm -rf $BUILD_BALL/opt/snmp/share/snmp/mib2c.perl.conf
+	rm -rf $BUILD_BALL/opt/snmp/share/snmp/snmp_perl.pl
+	rm -rf $BUILD_BALL/opt/snmp/share/man/man5/snmpd.conf.5
+	rm -rf $BUILD_BALL/opt/snmp/bin/snmpcheck
+	rm -rf $BUILD_BALL/opt/snmp/bin/tkmib
+	rm -rf $BUILD_BALL/opt/snmp/bin/snmpcheck
 }
 
 # }}}
@@ -170,7 +178,7 @@ function sw_set_rpm_env()
 	cd $CUR_PWD
 	check_return_exit
 	echo "build rpm spec file...."
-	#./build_spec
+	./build_spec
 	check_return_exit
 
 	echo "mv spec to buildroot ..."
