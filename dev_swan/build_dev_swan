@@ -154,6 +154,7 @@ SRC_GD="$TMP_DIR/`ls $TMP_DIR |grep libgd`"
 SRC_LIBXML="$TMP_DIR/`ls $TMP_DIR |grep libxml`"
 SRC_LIBXSLT="$TMP_DIR/`ls $TMP_DIR |grep libxslt`"
 SRC_LIBEVENT="$TMP_DIR/`ls $TMP_DIR |grep libevent`"
+SRC_LIBCURL="$TMP_DIR/`ls $TMP_DIR |grep curl`"
 SRC_ZMQ="$TMP_DIR/`ls $TMP_DIR |grep zeromq`"
 SRC_PTHREADS="$TMP_DIR/`ls $TMP_DIR |grep pthreads`"
 SRC_EVENTS="$TMP_DIR/`ls $TMP_DIR |grep event`"
@@ -180,6 +181,7 @@ INSTALL_GD="$INSTALL_PHP/gd"
 INSTALL_LIBXML="$INSTALL_PHP/libxml"
 INSTALL_LIBXSLT="$INSTALL_PHP/libxslt"
 INSTALL_LIBEVENT="$INSTALL_PHP/libevent"
+INSTALL_LIBCURL="$INSTALL_PHP/curl"
 INSTALL_ZMQ="$INSTALL_PHP/zmq"
 INSTALL_EXT="$INSTALL_PHP/ext"
 INSTALL_SNMP="$INSTALL_DIR/snmp"
@@ -479,6 +481,30 @@ function install_zlib()
 }
 
 # }}}
+# {{{ function install_curl()
+
+############################
+# 安装curl     #############
+############################
+function install_curl()
+{
+	echo "cd $SRC_LIBCURL ..."
+	cd $SRC_LIBCURL
+	check_return_exit
+	sw_mkdir $INSTALL_LIBCURL
+
+	echo "start configure curl ..."
+	CMD="./configure --prefix=$INSTALL_LIBCURL"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install curl ...."
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
 # {{{ function install_libxml2()
 
 ############################
@@ -669,6 +695,7 @@ function install_php()
 	install_libxml2
 	install_libxslt
 	install_libevent
+	install_curl
 
 	echo "cd $SRC_PHP ..."
 	cd $SRC_PHP
@@ -697,6 +724,7 @@ function install_php()
 		--with-freetype-dir=$INSTALL_FREETYPE \
 		--enable-mbstring \
 		--enable-sockets \
+		--with-curl=$INSTALL_LIBCURL \
 		--with-xsl=$INSTALL_LIBXSLT \
 	   --with-openssl \
 	"
