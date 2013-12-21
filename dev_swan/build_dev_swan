@@ -163,7 +163,9 @@ SRC_EIO="$TMP_DIR/`ls $TMP_DIR |grep eio`"
 SRC_IMAGICK="$TMP_DIR/`ls $TMP_DIR |grep imagick`"
 SRC_XDEBUG="$TMP_DIR/`ls $TMP_DIR |grep xdebug`"
 SRC_PHP_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.2`"
+SRC_PHP_MEMCACHE="$TMP_DIR/`ls $TMP_DIR |grep php-memcache`"
 SRC_SNMP="$TMP_DIR/`ls $TMP_DIR |grep net-snmp`"
+SRC_MEMCACHED="$TMP_DIR/`ls $TMP_DIR |grep memcached`"
 SRC_IMAGEMAGICK="$TMP_DIR/`ls $TMP_DIR |grep ImageMagick`"
 
 INSTALL_HTTPD="$INSTALL_DIR/apache2"
@@ -185,6 +187,7 @@ INSTALL_LIBCURL="$INSTALL_PHP/curl"
 INSTALL_ZMQ="$INSTALL_PHP/zmq"
 INSTALL_EXT="$INSTALL_PHP/ext"
 INSTALL_SNMP="$INSTALL_DIR/snmp"
+INSTALL_MEMCACHED="$INSTALL_DIR/memcached"
 INSTALL_IMAGEMAGICK="$INSTALL_PHP/imagemagick"
 ETC_DIR="$INSTALL_DIR/etc"
 RRDTOOL="$INSTALL_DIR/rrdtool"
@@ -695,6 +698,7 @@ function install_php()
 	install_libxml2
 	install_libxslt
 	install_libevent
+	install_memcached
 	install_curl
 
 	echo "cd $SRC_PHP ..."
@@ -845,6 +849,25 @@ function post_install_php()
 	make -j $CPU_NUM && make install
 	check_return_exit
 
+	# 安装 memcache
+	echo "Start install php memcache ...."
+	cd $SRC_PHP_MEMCACHE
+	check_return_exit
+
+	CMD="$INSTALL_PHP/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
 	# 安装 ImageMagick
 	install_imagemagick
 	echo "Start install ImageMagick ...."
@@ -936,6 +959,34 @@ function install_redis()
 	echo $CMD
 	eval $CMD
 	CMD="make -j $CPU_NUM && make PREFIX=$INSTALL_REDIS install"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+}
+
+# }}}
+# }}}
+# {{{ install memcached
+# {{{ function install_memcached()
+
+############################
+# 安装 memcached ###########
+############################
+function install_memcached()
+{
+	echo "start install memcached ..."
+
+	sw_mkdir $INSTALL_MEMCACHED
+	echo "make and make install memcached..."
+	CMD="cd $SRC_MEMCACHED"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="./configure --prefix=$INSTALL_MEMCACHED --with-libevent=$INSTALL_LIBEVENT"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="make -j $CPU_NUM && make install"
 	echo $CMD
 	eval $CMD
 	check_return_exit
