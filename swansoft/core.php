@@ -32,7 +32,7 @@ define('SWAN_ROOT', '/usr/local/swan/');
 define('SWAN_SOFTNAME', 'swansoft');
 
 // 软件版本号
-define('SWAN_VERSION', '0.2.0');
+define('SWAN_VERSION', '0.2.1');
 
 // 软件发行号
 define('SWANBR_RELEASE', 'beta');
@@ -41,7 +41,7 @@ define('SWANBR_RELEASE', 'beta');
 define('SWANBR_SLOGAN', 'Everything in order to facilitate');
 
 //版权声明
-define('SWANBR_COPYRIGHT', '© 2011-2012 swanlinux');
+define('SWANBR_COPYRIGHT', '© 2012-2014 swanlinux');
 
 //许可协议 
 define('SWANBR_LICENSED_URL', 'BSD');

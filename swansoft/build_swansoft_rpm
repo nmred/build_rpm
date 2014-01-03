@@ -17,14 +17,16 @@
 # 相关配置项   #############
 ############################
 CUR_PWD=`pwd`
-PATH_OPT=/usr/local/swan/opt
-PATH_TMP_CODE=/usr/local/tmp_swan_git
-PATH_OPT_MAKE=$PATH_TMP_CODE/opt/etc
+PATH_DEV_SWAN=/usr/local/swan
+PATH_OPT=$PATH_DEV_SWAN/opt
+PATH_WEB=$PATH_DEV_SWAN/web
+PATH_TMP_CODE=/usr/local/tmp_swansoft_git
+PATH_OPT_MAKE=$PATH_TMP_CODE/opt
 
 BUILD_ROOT="/home/hzx/rpmbuild"
 GIT_SWANSOFT="/root/code/swansoft"
 SWANSOFT_NAME="swansoft"
-SWANSOFT_VERSION="0.2.0"
+SWANSOFT_VERSION="0.2.1"
 BUILD_TMP=/tmp
 BUILD_BALL=$BUILD_TMP/$SWANSOFT_NAME-$SWANSOFT_VERSION
 
@@ -79,6 +81,8 @@ function sw_configure()
 
 	echo "mkdir opt dir ..."
 	sw_mkdir $PATH_OPT_MAKE
+	sw_mkdir $PATH_OPT_MAKE/etc
+	check_return_exit
 
 	echo " make code to tmp_swan_git dir ..."
 	make install
@@ -95,16 +99,27 @@ function sw_configure()
 
 # }}}
 ###############################
-#copy opt code to /tmp        #
+#copy opt , web code to /tmp        #
 ###############################
 # {{{ function sw_copy_opt()
 
 function sw_copy_opt()
 {
-	echo "copt opt to $BUILD_BALL ..."
+	echo "copt opt, web to $BUILD_BALL ..."
 	echo "cp -r $PATH_OPT/* $BUILD_BALL/opt ..."
 	cp -r $PATH_OPT/* $BUILD_BALL/opt
 	check_return_exit
+
+	# 删除影响打包的文件
+	rm -rf $BUILD_BALL/opt/snmp/share/snmp/mib2c.perl.conf 
+	rm -rf $BUILD_BALL/opt/snmp/bin/snmp-bridge-mib 
+	rm -rf $BUILD_BALL/opt/snmp/bin/mib2c 
+	rm -rf $BUILD_BALL/opt/snmp/share/snmp/mib2c.perl.conf
+	rm -rf $BUILD_BALL/opt/snmp/share/snmp/snmp_perl.pl
+	rm -rf $BUILD_BALL/opt/snmp/share/man/man5/snmpd.conf.5
+	rm -rf $BUILD_BALL/opt/snmp/bin/snmpcheck
+	rm -rf $BUILD_BALL/opt/snmp/bin/tkmib
+	rm -rf $BUILD_BALL/opt/snmp/bin/snmpcheck
 }
 
 # }}}
@@ -169,7 +184,7 @@ function sw_set_rpm_env()
 	check_return_exit
 
 	echo "mv spec to buildroot ..."
-	mv $SWANSOFT_NAME-$SWANSOFT_VERSION.spec $BUILD_ROOT/SPECS
+	cp $SWANSOFT_NAME-$SWANSOFT_VERSION.spec $BUILD_ROOT/SPECS
 	check_return_exit
 
 	echo "mv tar file to SOURCES ..."
