@@ -155,6 +155,7 @@ SRC_LIBXML="$TMP_DIR/`ls $TMP_DIR |grep libxml`"
 SRC_LIBXSLT="$TMP_DIR/`ls $TMP_DIR |grep libxslt`"
 SRC_LIBEVENT="$TMP_DIR/`ls $TMP_DIR |grep libevent`"
 SRC_LIBCURL="$TMP_DIR/`ls $TMP_DIR |grep curl`"
+SRC_LIBMEMCACHED="$TMP_DIR/`ls $TMP_DIR |grep libmemcached`"
 SRC_ZMQ="$TMP_DIR/`ls $TMP_DIR |grep zeromq`"
 SRC_PTHREADS="$TMP_DIR/`ls $TMP_DIR |grep pthreads`"
 SRC_EVENTS="$TMP_DIR/`ls $TMP_DIR |grep event`"
@@ -860,6 +861,7 @@ function post_install_php()
 	check_return_exit
 	
 	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+			--with-libmemcached-dir=$INSTALL_MEMCACHED
 		"
 	echo $CMD
 	eval $CMD
@@ -983,6 +985,20 @@ function install_memcached()
 	eval $CMD
 	check_return_exit
 	CMD="./configure --prefix=$INSTALL_MEMCACHED --with-libevent=$INSTALL_LIBEVENT"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="make -j $CPU_NUM && make install"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	#install libmemcached
+	CMD="cd $SRC_LIBMEMCACHED"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="./configure --prefix=$INSTALL_MEMCACHED"
 	echo $CMD
 	eval $CMD
 	check_return_exit
