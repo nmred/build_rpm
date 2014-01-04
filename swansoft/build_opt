@@ -157,6 +157,7 @@ SRC_PTHREADS="$TMP_DIR/`ls $TMP_DIR |grep pthreads`"
 SRC_EVENTS="$TMP_DIR/`ls $TMP_DIR |grep event`"
 SRC_PHP_ZMQ="$TMP_DIR/`ls $TMP_DIR |grep php-zmq`"
 SRC_EIO="$TMP_DIR/`ls $TMP_DIR |grep eio`"
+SRC_DIO="$TMP_DIR/`ls $TMP_DIR |grep dio`"
 SRC_IMAGICK="$TMP_DIR/`ls $TMP_DIR |grep imagick`"
 SRC_XDEBUG="$TMP_DIR/`ls $TMP_DIR |grep xdebug`"
 SRC_PHP_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.2`"
@@ -506,6 +507,25 @@ function post_install_php()
 	
 	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
 			--with-zmq=$INSTALL_ZMQ \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	#安装 DIO
+	echo "Start install dio...."
+	cd $SRC_DIO
+	check_return_exit
+
+	CMD="$INSTALL_PHP/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
 		"
 	echo $CMD
 	eval $CMD
