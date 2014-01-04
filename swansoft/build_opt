@@ -134,7 +134,7 @@ function sw_pre_install()
 
 # }}}
 
-sw_pre_install
+#sw_pre_install
 
 # 软件的源文件
 SRC_RRDTOOL="$TMP_DIR/`ls $TMP_DIR |grep rrdtool`"
@@ -161,7 +161,7 @@ SRC_IMAGICK="$TMP_DIR/`ls $TMP_DIR |grep imagick`"
 SRC_XDEBUG="$TMP_DIR/`ls $TMP_DIR |grep xdebug`"
 SRC_PHP_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.2`"
 SRC_PHP_MEMCACHE="$TMP_DIR/`ls $TMP_DIR |grep php-memcache`"
-SRC_MEMCACHED="$TMP_DIR/`ls $TMP_DIR |grep memcached`"
+SRC_MEMCACHED="$TMP_DIR/`ls $TMP_DIR |grep memcached-1\.4`"
 SRC_IMAGEMAGICK="$TMP_DIR/`ls $TMP_DIR |grep ImageMagick`"
 SRC_RSYSLOG="$TMP_DIR/`ls $TMP_DIR |grep rsyslog`"
 SRC_JSON_C="$TMP_DIR/`ls $TMP_DIR |grep json-c`"
@@ -761,7 +761,6 @@ function install_rsyslogd()
 	eval $CMD
 	check_return_exit
 
-	unset PKG_CONFIG_PATH
 	CMD="export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$INSTALL_RSYSLOGD/lib/pkgconfig/;./configure --prefix=$INSTALL_RSYSLOGD "
 	echo $CMD
 	eval $CMD
@@ -779,7 +778,6 @@ function install_rsyslogd()
 	echo $CMD
 	eval $CMD
 	check_return_exit
-	unset PKG_CONFIG_PATH
 	CMD="export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$INSTALL_RSYSLOGD/lib/pkgconfig/;./configure --prefix=$INSTALL_RSYSLOGD "
 	echo $CMD
 	eval $CMD
@@ -809,6 +807,8 @@ function sw_after_install()
 
 # }}}
 
+install_rsyslogd
+exit;
 case $1 in
 redis)
 	install_redis

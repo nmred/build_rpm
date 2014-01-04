@@ -71,21 +71,18 @@ function sw_mkdir()
 function sw_configure()
 {
 	echo "start configure code ..."
-	echo "cd $GIT_SWANSOFT ..."
-	cd $GIT_SWANSOFT
-	check_return_exit
-
-	echo " configure -m build_rpm code ..."
-	./configure -m build_rpm
-	check_return_exit
 
 	echo "mkdir opt dir ..."
 	sw_mkdir $PATH_OPT_MAKE
 	sw_mkdir $PATH_OPT_MAKE/etc
 	check_return_exit
 
-	echo " make code to tmp_swan_git dir ..."
-	make install
+	echo "cd $GIT_SWANSOFT ..."
+	cd $GIT_SWANSOFT
+	check_return_exit
+
+	echo " install  build_rpm code ..."
+	./install.sh build_rpm
 	check_return_exit
 
 	# 执行替换，并且存放到 /tmp/swansoft_版本 的目录
