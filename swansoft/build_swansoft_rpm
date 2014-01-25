@@ -26,7 +26,7 @@ PATH_OPT_MAKE=$PATH_TMP_CODE/opt
 BUILD_ROOT="/home/hzx/rpmbuild"
 GIT_SWANSOFT="/root/code/swansoft"
 SWANSOFT_NAME="swansoft"
-SWANSOFT_VERSION="0.2.1"
+SWANSOFT_VERSION="0.2.2"
 BUILD_TMP=/tmp
 BUILD_BALL=$BUILD_TMP/$SWANSOFT_NAME-$SWANSOFT_VERSION
 
@@ -74,7 +74,6 @@ function sw_configure()
 
 	echo "mkdir opt dir ..."
 	sw_mkdir $PATH_OPT_MAKE
-	sw_mkdir $PATH_OPT_MAKE/etc
 	check_return_exit
 
 	echo "cd $GIT_SWANSOFT ..."
@@ -104,19 +103,9 @@ function sw_copy_opt()
 {
 	echo "copt opt, web to $BUILD_BALL ..."
 	echo "cp -r $PATH_OPT/* $BUILD_BALL/opt ..."
+	sw_mkdir $BUILD_BALL/opt
 	cp -r $PATH_OPT/* $BUILD_BALL/opt
 	check_return_exit
-
-	# 删除影响打包的文件
-	rm -rf $BUILD_BALL/opt/snmp/share/snmp/mib2c.perl.conf 
-	rm -rf $BUILD_BALL/opt/snmp/bin/snmp-bridge-mib 
-	rm -rf $BUILD_BALL/opt/snmp/bin/mib2c 
-	rm -rf $BUILD_BALL/opt/snmp/share/snmp/mib2c.perl.conf
-	rm -rf $BUILD_BALL/opt/snmp/share/snmp/snmp_perl.pl
-	rm -rf $BUILD_BALL/opt/snmp/share/man/man5/snmpd.conf.5
-	rm -rf $BUILD_BALL/opt/snmp/bin/snmpcheck
-	rm -rf $BUILD_BALL/opt/snmp/bin/tkmib
-	rm -rf $BUILD_BALL/opt/snmp/bin/snmpcheck
 }
 
 # }}}

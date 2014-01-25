@@ -21,11 +21,13 @@ CUR_PWD="`pwd`"
 TMP_DIR="/tmp/swan/"
 OPENSOURCE="/usr/local/swan_open/"
 
-#将 环境编译到临时目录中
 SWAN_ROOT="/usr/local/swan"
-INSTALL_DIR="$SWAN_ROOT/opt"
-SWAN_LOG="$SWAN_ROOT/log"
-SWAN_DATA="$SWAN_ROOT/data"
+PATH_INSTALL="$SWAN_ROOT/opt"
+PATH_INCLUDE="$PATH_INSTALL/include"
+PATH_LIB="$PATH_INSTALL/lib"
+PATH_BIN="$PATH_INSTALL/bin"
+PATH_SBIN="$PATH_INSTALL/sbin"
+ETC_DIR="$SWAN_ROOT/etc"
 
 ############################
 #          函数        #####
@@ -114,17 +116,19 @@ function sw_pre_install()
 		rm -rf $TMP_DIR
 		check_return_exit
 	fi
-	if [ -d $INSTALL_DIR ]; then
-		echo "remove $INSTALL_DIR ..."
-		rm -rf $INSTALL_DIR
+	if [ -d $PATH_INSTALL ]; then
+		echo "remove $PATH_INSTALL ..."
+		rm -rf $PATH_INSTALL
 		check_return_exit
 	fi
 	echo "build install directory | extract soucre file ..."
 
 	#创建安装目录
-	sw_mkdir $INSTALL_DIR
-	sw_mkdir $INSTALL_PHP
-	sw_mkdir $INSTALL_MYSQL
+	sw_mkdir $PATH_INSTALL
+	sw_mkdir $PATH_INCLUDE
+	sw_mkdir $PATH_LIB
+	sw_mkdir $PATH_BIN
+	sw_mkdir $PATH_SBIN
 	sw_mkdir $TMP_DIR
 	sw_mkdir $ETC_DIR
 
@@ -134,7 +138,7 @@ function sw_pre_install()
 
 # }}}
 
-#sw_pre_install
+sw_pre_install
 
 # 软件的源文件
 SRC_RRDTOOL="$TMP_DIR/`ls $TMP_DIR |grep rrdtool`"
@@ -142,78 +146,22 @@ SRC_PCRE="$TMP_DIR/`ls $TMP_DIR |grep pcre`"
 SRC_MYSQL="$TMP_DIR/`ls $TMP_DIR |grep mysql`"
 SRC_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.8`"
 SRC_PHP="$TMP_DIR/`ls $TMP_DIR |grep php`"
-SRC_JPEG="$TMP_DIR/`ls $TMP_DIR |grep jpeg`"
-SRC_LIBPNG="$TMP_DIR/`ls $TMP_DIR |grep libpng`"
-SRC_FREETYPE="$TMP_DIR/`ls $TMP_DIR |grep freetype`"
-SRC_ZLIB="$TMP_DIR/`ls $TMP_DIR |grep zlib`"
 SRC_GD="$TMP_DIR/`ls $TMP_DIR |grep libgd`"
 SRC_LIBXML="$TMP_DIR/`ls $TMP_DIR |grep libxml`"
 SRC_LIBXSLT="$TMP_DIR/`ls $TMP_DIR |grep libxslt`"
 SRC_LIBEVENT="$TMP_DIR/`ls $TMP_DIR |grep libevent`"
 SRC_LIBCURL="$TMP_DIR/`ls $TMP_DIR |grep curl`"
-SRC_LIBMEMCACHED="$TMP_DIR/`ls $TMP_DIR |grep libmemcached`"
-SRC_ZMQ="$TMP_DIR/`ls $TMP_DIR |grep zeromq`"
-SRC_PTHREADS="$TMP_DIR/`ls $TMP_DIR |grep pthreads`"
 SRC_EVENTS="$TMP_DIR/`ls $TMP_DIR |grep event`"
-SRC_PHP_ZMQ="$TMP_DIR/`ls $TMP_DIR |grep php-zmq`"
 SRC_EIO="$TMP_DIR/`ls $TMP_DIR |grep eio`"
 SRC_DIO="$TMP_DIR/`ls $TMP_DIR |grep dio`"
 SRC_IMAGICK="$TMP_DIR/`ls $TMP_DIR |grep imagick`"
 SRC_XDEBUG="$TMP_DIR/`ls $TMP_DIR |grep xdebug`"
 SRC_PHP_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.2`"
-SRC_PHP_MEMCACHE="$TMP_DIR/`ls $TMP_DIR |grep php-memcache`"
-SRC_MEMCACHED="$TMP_DIR/`ls $TMP_DIR |grep memcached-1\.4`"
-SRC_IMAGEMAGICK="$TMP_DIR/`ls $TMP_DIR |grep ImageMagick`"
 SRC_RSYSLOG="$TMP_DIR/`ls $TMP_DIR |grep rsyslog`"
 SRC_JSON_C="$TMP_DIR/`ls $TMP_DIR |grep json-c`"
 SRC_LIBESTR="$TMP_DIR/`ls $TMP_DIR |grep libestr`"
-
-INSTALL_PHP="$INSTALL_DIR/php"
-INSTALL_MYSQL="$INSTALL_DIR/mysql"
-INSTALL_REDIS="$INSTALL_DIR/redis"
-INSTALL_RSYSLOGD="$INSTALL_DIR/rsyslogd"
-INSTALL_LIBXML="$INSTALL_PHP/libxml"
-INSTALL_LIBXSLT="$INSTALL_PHP/libxslt"
-INSTALL_LIBEVENT="$INSTALL_PHP/libevent"
-INSTALL_LIBCURL="$INSTALL_PHP/curl"
-INSTALL_ZMQ="$INSTALL_PHP/zmq"
-INSTALL_EXT="$INSTALL_PHP/ext"
-INSTALL_MEMCACHED="$INSTALL_DIR/memcached"
-INSTALL_IMAGEMAGICK="$INSTALL_PHP/imagemagick"
-ETC_DIR="$INSTALL_DIR/etc"
-RRDTOOL="$INSTALL_DIR/rrdtool"
-MYSQL_DATA="$INSTALL_DIR/data/mysql"
-INATLL_LOG="$INSTALL_DIR/install.log"
-
+SRC_RRDTOOL="$TMP_DIR/`ls $TMP_DIR |grep rrdtool`"
 FIXED_BUG_DIR="$CUR_PWD/fixed_bug"
-
-############################
-# 必要检查函数库       #####
-############################
-# {{{ function check_libtool()
-
-function check_libtool()
-{
-	is_exists=`rpm -q libtool | wc -l`
-	if [ "$is_exists" -lt "1" ];then
-		echo "libtool not install . [FAIL]"
-		exit 1
-	fi		
-}
-
-# }}}
-# {{{ function check_gccadd()
-
-function check_gccadd()
-{
-	is_exists=`rpm -q gcc-c++ | wc -l`
-	if [ "$is_exists" -lt "1" ];then
-		echo "gcc-c++ not install . [FAIL]"
-		exit 1
-	fi
-}
-
-# }}}
 
 # {{{ install mysql
 # {{{ function install_mysql()
@@ -224,36 +172,21 @@ function check_gccadd()
 function install_mysql()
 {
 	echo "start install mysql ..."
-	echo "cp $SRC_MYSQL to $INSTALL_MYSQL"
-	cp -r $SRC_MYSQL $INSTALL_MYSQL
+	echo "cp $SRC_MYSQL to $PATH_INSTALL/mysql/"
+	cp -r $SRC_MYSQL $PATH_INSTALL/mysql
 	check_return_exit
 
 	#删除 mysql-test 和lib/plugin/libdaemon_example* 防止不必要的依赖
 	echo "remove mysql-test and lib/plugin/libdaemon_example* ..."
-	rm -rf $INSTALL_MYSQL/mysql-test
+	rm -rf $PATH_INSTALL/mysql/mysql-test
 	check_return_exit
-	rm -rf $INSTALL_MYSQL/lib/plugin/libdaemon_example*
+	rm -rf $PATH_INSTALL/mysql/lib/plugin/libdaemon_example*
 	check_return_exit
 }
 
 # }}}
 # }}}
 # {{{ install php
-# {{{ function pre_install_php()
-
-############################
-# 静态编译扩展预处理 #######
-############################
-function pre_install_php()
-{
-	#处理pthreads扩展
-	sw_mkdir $INSTALL_EXT/pthreads
-	echo "start install php-ext pthreads ..."
-	cp -r $SRC_PTHREADS $INSTALL_EXT
-	check_return_exit
-}
-
-# }}}
 # {{{ function install_curl()
 
 ############################
@@ -264,10 +197,9 @@ function install_curl()
 	echo "cd $SRC_LIBCURL ..."
 	cd $SRC_LIBCURL
 	check_return_exit
-	sw_mkdir $INSTALL_LIBCURL
 
 	echo "start configure curl ..."
-	CMD="./configure --prefix=$INSTALL_LIBCURL"
+	CMD="./configure --prefix=$PATH_INSTALL"
 	echo $CMD
 	eval $CMD
 	check_return_exit
@@ -289,10 +221,8 @@ function install_libxml2()
 	cd $SRC_LIBXML
 	check_return_exit
 
-	sw_mkdir $INSTALL_LIBXML
-
 	echo "start configure libxml2 ..."
-	CMD="./configure --prefix=$INSTALL_LIBXML"
+	CMD="./configure --prefix=$PATH_INSTALL"
 	echo $CMD
 	eval $CMD
 	check_return_exit
@@ -314,48 +244,16 @@ function install_libxslt()
 	cd $SRC_LIBXSLT
 	check_return_exit
 
-	sw_mkdir $INSTALL_LIBXSLT
-
 	echo "start configure libxslt ..."
-	CMD="./configure --prefix=$INSTALL_LIBXSLT \
-			--with-libxml-prefix=$INSTALL_LIBXML \
-			--with-libxml-include-prefix=$INSTALL_LIBXML/include \
-			--with-libxml-libs-prefix=$INSTALL_LIBXML/lib"
+	CMD="./configure --prefix=$PATH_INSTALL \
+			--with-libxml-prefix=$PATH_INSTALL \
+			--with-libxml-include-prefix=$PATH_INCLUDE \
+			--with-libxml-libs-prefix=$PATH_LIB"
 	echo $CMD
 	eval $CMD
 	check_return_exit
 
 	echo "start make && make install libxslt ..."
-	make -j $CPU_NUM && make install
-	check_return_exit
-}
-
-# }}}
-# {{{ function install_imagemagick()
-
-############################
-# 安装 imagemagick 库     #############
-############################
-function install_imagemagick()
-{
-	echo "cd $SRC_IMAGEMAGICK ..."
-	cd $SRC_IMAGEMAGICK
-	check_return_exit
-
-	sw_mkdir $INSTALL_IMAGEMAGICK
-
-	echo "start configure IMAGEMAGICK ..."
-	CMD="
-	./configure --prefix=$INSTALL_IMAGEMAGICK \
-	"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	echo "start make && make install imagemagick ..."
-	echo "cd $SRC_IMAGEMAGICK ..."
-	cd $SRC_IMAGEMAGICK
-	check_return_exit
 	make -j $CPU_NUM && make install
 	check_return_exit
 }
@@ -372,44 +270,36 @@ function install_libevent()
 	cd $SRC_LIBEVENT
 	check_return_exit
 
-	sw_mkdir $INSTALL_LIBEVENT
-
 	echo "start configure libevent ..."
-	CMD="./configure --prefix=$INSTALL_LIBEVENT"
+	CMD="./configure --prefix=$PATH_INSTALL"
 	echo $CMD
 	eval $CMD
 	check_return_exit
 
-	echo "start make && make install libzmq ..."
+	echo "start make && make install libevent ..."
 	make -j $CPU_NUM && make install
 	check_return_exit
 }
 
 # }}}
-# {{{ function install_zmq()
+# {{{ function install_rrdtool()
 
 ############################
-# 安装zmq  #############
+# 安装 rrdtool     #########
 ############################
-function install_zmq()
+function install_rrdtool()
 {
-	echo "cd $SRC_ZMQ ..."
-	cd $SRC_ZMQ
+	echo "cd $SRC_RRDTOOL ..."
+	cd $SRC_RRDTOOL
 	check_return_exit
 
-	sw_mkdir $INSTALL_ZMQ
-
-	# 删除错误的单元测试文件 test_connect_delay.cpp
-	cp $FIXED_BUG_DIR/zmq/test_connect_delay.cpp $SRC_ZMQ/tests/test_connect_delay.cpp
-	check_return_exit
-
-	echo "start configure zmq ..."
-	CMD="./configure --prefix=$INSTALL_ZMQ"
+	echo "start configure rrdtool ..."
+	CMD="./configure --prefix=$PATH_INSTALL"
 	echo $CMD
 	eval $CMD
 	check_return_exit
 
-	echo "start make && make install libzmq ..."
+	echo "start make && make install rrdtool ...."
 	make -j $CPU_NUM && make install
 	check_return_exit
 }
@@ -424,11 +314,9 @@ function install_php()
 {
 	echo "start install php ...."
 	echo "perpare install php ..."
-	pre_install_php
 	install_libxml2
 	install_libxslt
 	install_libevent
-	install_memcached
 	install_curl
 
 	echo "cd $SRC_PHP ..."
@@ -437,22 +325,20 @@ function install_php()
 
 	echo "start configure php ..."
 	CMD="
-	./configure --prefix=$INSTALL_PHP \
-		--with-config-file-path=$ETC_DIR \
-		--enable-maintainer-zts \
-		--enable-pthreads \
-		--with-pdo-mysql=$INSTALL_MYSQL \
-		--with-mysql=$INSTALL_MYSQL \
+	./configure --prefix=$PATH_INSTALL \
+		--with-config-file-path=$ETC_DIR/php \
+		--with-pdo-mysql=$PATH_INSTALL/mysql \
+		--with-mysql=$PATH_INSTALL/mysql \
 		--enable-ftp \
 		--with-gettext \
 		--enable-shmop \
 		--enable-pcntl \
-		--with-libxml-dir=$INSTALL_LIBXML \
+		--with-libxml-dir=$PATH_INSTALL \
 		--enable-soap \
 		--enable-mbstring \
 		--enable-sockets \
-		--with-curl=$INSTALL_LIBCURL \
-		--with-xsl=$INSTALL_LIBXSLT \
+		--with-curl=$PATH_INSTALL \
+		--with-xsl=$PATH_INSTALL \
 	   --with-openssl \
 	"
 	echo $CMD
@@ -478,35 +364,13 @@ function post_install_php()
 	cd $SRC_EVENTS
 	check_return_exit
 
-	CMD="$INSTALL_PHP/bin/phpize";
+	CMD="$PATH_INSTALL/bin/phpize";
 	echo $CMD
 	eval $CMD
 	check_return_exit
 	
-	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
-			--with-event-libevent-dir=$INSTALL_LIBEVENT \
-		"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	make -j $CPU_NUM && make install
-	check_return_exit
-
-	# 安装 zmq
-	install_zmq
-
-	echo "Start install zmq...."
-	cd $SRC_PHP_ZMQ
-	check_return_exit
-
-	CMD="$INSTALL_PHP/bin/phpize";
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	
-	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
-			--with-zmq=$INSTALL_ZMQ \
+	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
+			--with-event-libevent-dir=$PATH_INSTALL \
 		"
 	echo $CMD
 	eval $CMD
@@ -520,50 +384,12 @@ function post_install_php()
 	cd $SRC_DIO
 	check_return_exit
 
-	CMD="$INSTALL_PHP/bin/phpize";
+	CMD="$PATH_INSTALL/bin/phpize";
 	echo $CMD
 	eval $CMD
 	check_return_exit
 	
-	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
-		"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	make -j $CPU_NUM && make install
-	check_return_exit
-
-	#安装 EIO
-	echo "Start install eio...."
-	cd $SRC_EIO
-	check_return_exit
-
-	CMD="$INSTALL_PHP/bin/phpize";
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	
-	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
-		"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	make -j $CPU_NUM && make install
-	check_return_exit
-
-	# 安装 xdebug
-	echo "Start install xdebug...."
-	cd $SRC_XDEBUG
-	check_return_exit
-
-	CMD="$INSTALL_PHP/bin/phpize";
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	
-	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
 		"
 	echo $CMD
 	eval $CMD
@@ -577,105 +403,18 @@ function post_install_php()
 	cd $SRC_PHP_REDIS
 	check_return_exit
 
-	CMD="$INSTALL_PHP/bin/phpize";
+	CMD="$PATH_INSTALL/bin/phpize";
 	echo $CMD
 	eval $CMD
 	check_return_exit
 	
-	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
+	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
 		"
 	echo $CMD
 	eval $CMD
 	check_return_exit
 
 	make -j $CPU_NUM && make install
-	check_return_exit
-
-	# 安装 memcache
-	echo "Start install php memcache ...."
-	cd $SRC_PHP_MEMCACHE
-	check_return_exit
-
-	CMD="$INSTALL_PHP/bin/phpize";
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	
-	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
-			--with-libmemcached-dir=$INSTALL_MEMCACHED
-		"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	make -j $CPU_NUM && make install
-	check_return_exit
-
-	# 安装 ImageMagick
-	install_imagemagick
-	echo "Start install ImageMagick ...."
-	cd $SRC_IMAGICK
-	check_return_exit
-
-	CMD="$INSTALL_PHP/bin/phpize";
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	
-	CMD="ln -s $INSTALL_IMAGEMAGICK/include/ImageMagick-6 $INSTALL_IMAGEMAGICK/include/ImageMagick"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	CMD="./configure --with-php-config=$INSTALL_PHP/bin/php-config \
-			--with-imagick=$INSTALL_IMAGEMAGICK \
-			PKG_CONFIG_PATH=$INSTALL_IMAGEMAGICK/lib/pkgconfig/
-		"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	make -j $CPU_NUM && make install
-	check_return_exit
-	
-
-	# 安装  pear 相关扩展
-#	install_pear
-}
-
-# }}}
-# {{{ function install_pear()
-
-#########################################
-# 安装pear (为了保证正确，需要手动执行)##
-#########################################
-function install_pear()
-{
-	PHP_BIN_PEAR="$INSTALL_PHP/bin/pear"
-	echo "start install pear ext ..."
-	CMD="$PHP_BIN_PEAR config-set auto_discover 1
-	"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	# 安装 PHPUnit
-	CMD="$PHP_BIN_PEAR install pear.phpunit.de/PHPUnit
-	"	
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	CMD="$PHP_BIN_PEAR install phpunit/DbUnit
-	"
-	echo $CMD
-	eval $CMD
-
-	# 安装 PHP_UML
-	CMD="$PHP_BIN_PEAR install PHP_UML 
-	"
-	echo $CMD
-	eval $CMD
 	check_return_exit
 }
 
@@ -696,54 +435,11 @@ function install_redis()
 	eval $CMD
 	check_return_exit
 
-	sw_mkdir $INSTALL_REDIS
 	echo "make and make install redis..."
 	CMD="cd $SRC_REDIS"
 	echo $CMD
 	eval $CMD
-	CMD="make -j $CPU_NUM && make PREFIX=$INSTALL_REDIS install"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-}
-
-# }}}
-# }}}
-# {{{ install memcached
-# {{{ function install_memcached()
-
-############################
-# 安装 memcached ###########
-############################
-function install_memcached()
-{
-	echo "start install memcached ..."
-
-	sw_mkdir $INSTALL_MEMCACHED
-	echo "make and make install memcached..."
-	CMD="cd $SRC_MEMCACHED"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	CMD="./configure --prefix=$INSTALL_MEMCACHED --with-libevent=$INSTALL_LIBEVENT"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	CMD="make -j $CPU_NUM && make install"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-
-	#install libmemcached
-	CMD="cd $SRC_LIBMEMCACHED"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	CMD="./configure --prefix=$INSTALL_MEMCACHED"
-	echo $CMD
-	eval $CMD
-	check_return_exit
-	CMD="make -j $CPU_NUM && make install"
+	CMD="make -j $CPU_NUM && make PREFIX=$PATH_INSTALL install"
 	echo $CMD
 	eval $CMD
 	check_return_exit
@@ -760,14 +456,18 @@ function install_memcached()
 function install_rsyslogd()
 {
 	echo "start install rsyslogd ..."
-
-	sw_mkdir $INSTALL_RSYSLOGD
 	echo "make and make install rsyslogd..."
+	CMD="CFLAGS='-I$PATH_INCLUDE ' \
+		CPPFLAGS='-I$PATH_INCLUDE' \
+		LDFLAGS='-L$PATH_LIB -Wl,-R$PATH_LIB' \
+	"
+	echo $CMD
+	eval $CMD
 	CMD="cd $SRC_LIBESTR"
 	echo $CMD
 	eval $CMD
 	check_return_exit
-	CMD="./configure --prefix=$INSTALL_RSYSLOGD "
+	CMD="./configure --prefix=$PATH_INSTALL "
 	echo $CMD
 	eval $CMD
 	check_return_exit
@@ -781,7 +481,7 @@ function install_rsyslogd()
 	eval $CMD
 	check_return_exit
 
-	CMD="export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$INSTALL_RSYSLOGD/lib/pkgconfig/;./configure --prefix=$INSTALL_RSYSLOGD "
+	CMD="export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$PATH_LIB/pkgconfig/;./configure --prefix=$PATH_INSTALL "
 	echo $CMD
 	eval $CMD
 	check_return_exit
@@ -798,7 +498,7 @@ function install_rsyslogd()
 	echo $CMD
 	eval $CMD
 	check_return_exit
-	CMD="export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$INSTALL_RSYSLOGD/lib/pkgconfig/;./configure --prefix=$INSTALL_RSYSLOGD "
+	CMD="./configure --prefix=$PATH_INSTALL "
 	echo $CMD
 	eval $CMD
 	check_return_exit
@@ -826,9 +526,6 @@ function sw_after_install()
 }
 
 # }}}
-
-install_rsyslogd
-exit;
 case $1 in
 redis)
 	install_redis
@@ -850,6 +547,7 @@ php)
 	install_php
 	install_redis
 	install_rsyslogd
+	install_rrdtool
 	exit 0
 	;;
 esac
