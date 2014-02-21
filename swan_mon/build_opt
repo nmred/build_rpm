@@ -1,0 +1,495 @@
+#!/bin/sh
+# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: #
+# +---------------------------------------------------------------------------
+# | SWAN [ $_SWANBR_SLOGAN_$ ]
+# +---------------------------------------------------------------------------
+# | Copyright $_SWANBR_COPYRIGHT_$
+# +---------------------------------------------------------------------------
+# | Version  $_SWANBR_VERSION_$
+# +---------------------------------------------------------------------------
+# | Licensed ( $_SWANBR_LICENSED_URL_$ )
+# +---------------------------------------------------------------------------
+# | $_SWANBR_WEB_DOMAIN_$
+# +---------------------------------------------------------------------------
+#  编译所有的开源工具到一个临时目录
+
+############################
+# 相关配置项   #############
+############################
+CPU_NUM="4"
+CUR_PWD="`pwd`"
+TMP_DIR="/tmp/swan/"
+OPENSOURCE="/usr/local/swan_open/"
+
+SWAN_ROOT="/usr/local/swan_mon"
+PATH_INSTALL="$SWAN_ROOT/opt"
+PATH_INCLUDE="$PATH_INSTALL/include"
+PATH_LIB="$PATH_INSTALL/lib"
+PATH_BIN="$PATH_INSTALL/bin"
+PATH_SBIN="$PATH_INSTALL/sbin"
+ETC_DIR="$SWAN_ROOT/etc"
+
+############################
+#          函数        #####
+############################
+
+# {{{ check_return_exit()
+
+check_return_exit ()
+{
+    if ! test 0 = $?; then
+        echo -e "\n!!!!!!!!!! Error, this script will exit !!!!!!!!!!\n"
+        exit 1
+    fi
+}
+
+# }}}
+# {{{ function sw_mkdir()
+
+############################
+# 创建目录 #################
+############################
+function sw_mkdir()
+{
+	echo "create $1 directory ...";
+	if [ -d $1 ] ;then
+		echo "directory $1 already exists. " 
+	else
+		mkdir -p $1
+		check_return_exit
+	fi
+}
+
+# }}}
+# {{{ function sw_tar_all()
+
+############################
+# 通过tar解压文件 ##########
+############################
+function sw_tar_all()
+{
+	files=`ls $OPENSOURCE | grep .tar.gz`
+	for file in $files
+	do
+		if [ -d $TMP_DIR/`echo $file | sed 's/.tar.gz//'` ] ; then
+			echo "$file already extract ."
+			continue
+		fi
+		echo "start extract  $file ...";
+		tar -zxf $OPENSOURCE$file -C $TMP_DIR
+		check_return_exit
+	done
+}
+
+ # }}}
+# {{{ function sw_unzip_all()
+
+############################
+# 通过unzip解压文件 ########
+############################
+function sw_unzip_all()
+{
+	files=`ls $OPENSOURCE | grep .zip`
+	for file in $files
+	do
+		if [ -d $TMP_DIR/`echo $file | sed 's/.zip//'` ] ; then
+			echo "$file already unzip ."
+			continue
+		fi
+		echo "start unzip $file ..."
+		unzip $OPENSOURCE$file -d $TMP_DIR >/dev/null 2>&1
+		check_return_exit
+	done
+}
+
+ # }}}
+
+############################
+#  安装编译前的预处理 ######
+############################
+# {{{ function sw_pre_install()
+
+function sw_pre_install()
+{
+	if [ -d $TMP_DIR ]; then
+		echo "remove $TMP_DIR ..."
+		rm -rf $TMP_DIR
+		check_return_exit
+	fi
+	if [ -d $PATH_INSTALL ]; then
+		echo "remove $PATH_INSTALL ..."
+		rm -rf $PATH_INSTALL
+		check_return_exit
+	fi
+	echo "build install directory | extract soucre file ..."
+
+	#创建安装目录
+	sw_mkdir $PATH_INSTALL
+	sw_mkdir $PATH_INCLUDE
+	sw_mkdir $PATH_LIB
+	sw_mkdir $PATH_BIN
+	sw_mkdir $PATH_SBIN
+	sw_mkdir $TMP_DIR
+	sw_mkdir $ETC_DIR
+
+	sw_tar_all
+	sw_unzip_all
+}
+
+# }}}
+
+sw_pre_install
+
+# 软件的源文件
+SRC_PCRE="$TMP_DIR/`ls $TMP_DIR |grep pcre`"
+SRC_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.8`"
+SRC_PHP="$TMP_DIR/`ls $TMP_DIR |grep php`"
+SRC_GD="$TMP_DIR/`ls $TMP_DIR |grep libgd`"
+SRC_LIBXML="$TMP_DIR/`ls $TMP_DIR |grep libxml`"
+SRC_LIBXSLT="$TMP_DIR/`ls $TMP_DIR |grep libxslt`"
+SRC_LIBEVENT="$TMP_DIR/`ls $TMP_DIR |grep libevent`"
+SRC_LIBCURL="$TMP_DIR/`ls $TMP_DIR |grep curl`"
+SRC_EVENTS="$TMP_DIR/`ls $TMP_DIR |grep event`"
+SRC_EIO="$TMP_DIR/`ls $TMP_DIR |grep eio`"
+SRC_DIO="$TMP_DIR/`ls $TMP_DIR |grep dio`"
+SRC_IMAGICK="$TMP_DIR/`ls $TMP_DIR |grep imagick`"
+SRC_XDEBUG="$TMP_DIR/`ls $TMP_DIR |grep xdebug`"
+SRC_PHP_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.2`"
+SRC_RSYSLOG="$TMP_DIR/`ls $TMP_DIR |grep rsyslog`"
+SRC_JSON_C="$TMP_DIR/`ls $TMP_DIR |grep json-c`"
+SRC_LIBESTR="$TMP_DIR/`ls $TMP_DIR |grep libestr`"
+FIXED_BUG_DIR="$CUR_PWD/fixed_bug"
+
+# {{{ install php
+# {{{ function install_curl()
+
+############################
+# 安装curl     #############
+############################
+function install_curl()
+{
+	echo "cd $SRC_LIBCURL ..."
+	cd $SRC_LIBCURL
+	check_return_exit
+
+	echo "start configure curl ..."
+	CMD="./configure --prefix=$PATH_INSTALL"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install curl ...."
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_libxml2()
+
+############################
+# 安装libxml2  #############
+############################
+function install_libxml2()
+{
+	echo "cd $SRC_LIBXML ..."
+	cd $SRC_LIBXML
+	check_return_exit
+
+	echo "start configure libxml2 ..."
+	CMD="./configure --prefix=$PATH_INSTALL"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install libxml2 ..."
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_libxslt()
+
+############################
+# 安装 libxslt  ############
+############################
+function install_libxslt()
+{
+	echo "cd $SRC_LIBXSLT ..."
+	cd $SRC_LIBXSLT
+	check_return_exit
+
+	echo "start configure libxslt ..."
+	CMD="./configure --prefix=$PATH_INSTALL \
+			--with-libxml-prefix=$PATH_INSTALL \
+			--with-libxml-include-prefix=$PATH_INCLUDE \
+			--with-libxml-libs-prefix=$PATH_LIB"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install libxslt ..."
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_libevent()
+
+############################
+# 安装libevent  #############
+############################
+function install_libevent()
+{
+	echo "cd $SRC_LIBEVENT ..."
+	cd $SRC_LIBEVENT
+	check_return_exit
+
+	echo "start configure libevent ..."
+	CMD="./configure --prefix=$PATH_INSTALL"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install libevent ..."
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_php
+
+############################
+# 安装php主程序 ############
+############################
+function install_php()
+{
+	echo "start install php ...."
+	echo "perpare install php ..."
+	install_libxml2
+	install_libxslt
+	install_libevent
+	install_curl
+
+	echo "cd $SRC_PHP ..."
+	cd $SRC_PHP
+	check_return_exit
+
+	echo "start configure php ..."
+	CMD="
+	./configure --prefix=$PATH_INSTALL \
+		--with-config-file-path=$ETC_DIR/php \
+		--enable-ftp \
+		--with-gettext \
+		--enable-shmop \
+		--enable-pcntl \
+		--with-libxml-dir=$PATH_INSTALL \
+		--enable-soap \
+		--enable-mbstring \
+		--enable-sockets \
+		--with-curl=$PATH_INSTALL \
+		--with-xsl=$PATH_INSTALL \
+	   --with-openssl \
+	"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install php ..."
+	make -j $CPU_NUM ZEND_EXTRA_LIBS='-lresolv' && make install
+	check_return_exit
+	post_install_php
+}
+# }}}
+# {{{ function post_install_php()
+
+###############################
+# 编译完成 PHP 动态编译扩展 ###
+###############################
+function post_install_php()
+{
+	echo "Start install ext and pear ..."
+	# 安装 events
+	echo "Start install event...."
+	cd $SRC_EVENTS
+	check_return_exit
+
+	CMD="$PATH_INSTALL/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
+			--with-event-libevent-dir=$PATH_INSTALL \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	#安装 DIO
+	echo "Start install dio...."
+	cd $SRC_DIO
+	check_return_exit
+
+	CMD="$PATH_INSTALL/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	# 安装 redis
+	echo "Start install redis ...."
+	cd $SRC_PHP_REDIS
+	check_return_exit
+
+	CMD="$PATH_INSTALL/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
+# }}}
+# {{{ install redis
+# {{{ function install_redis()
+
+############################
+# 安装redis    #############
+############################
+function install_redis()
+{
+	echo "start install redis ..."
+	echo "fixed .make-settings..."
+	CMD="cp $FIXED_BUG_DIR/redis/Makefile $SRC_REDIS/src/Makefile"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "make and make install redis..."
+	CMD="cd $SRC_REDIS"
+	echo $CMD
+	eval $CMD
+	CMD="make -j $CPU_NUM && make PREFIX=$PATH_INSTALL install"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+}
+
+# }}}
+# }}}
+# {{{ install rsyslogd
+# {{{ function install_rsyslogd()
+
+############################
+# 安装 rsyslogd   ##########
+############################
+function install_rsyslogd()
+{
+	echo "start install rsyslogd ..."
+	echo "make and make install rsyslogd..."
+	CMD="CFLAGS='-I$PATH_INCLUDE ' \
+		CPPFLAGS='-I$PATH_INCLUDE' \
+		LDFLAGS='-L$PATH_LIB -Wl,-R$PATH_LIB' \
+	"
+	echo $CMD
+	eval $CMD
+	CMD="cd $SRC_LIBESTR"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="./configure --prefix=$PATH_INSTALL "
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="make -j $CPU_NUM && make install"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	CMD="cd $SRC_JSON_C"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	CMD="export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$PATH_LIB/pkgconfig/;./configure --prefix=$PATH_INSTALL "
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="make -j $CPU_NUM && make install"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	CMD="cd $SRC_RSYSLOG"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="cp $FIXED_BUG_DIR/rsyslogd/configure ."
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="./configure --prefix=$PATH_INSTALL "
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="make -j $CPU_NUM && make install"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+}
+
+# }}}
+# }}}
+
+############################
+#  安装编译后的预处理 ######
+############################
+# {{{ function sw_after_install()
+
+function sw_after_install()
+{
+	if [ -d $TMP_DIR ]; then
+		echo "remove $TMP_DIR ..."
+		rm -rf $TMP_DIR
+		check_return_exit
+	fi
+}
+
+# }}}
+case $1 in
+redis)
+	install_redis
+	;;
+php)
+#安装php
+	install_php
+	;;
+*)
+#安装php
+	install_php
+	install_redis
+	install_rsyslogd
+	exit 0
+	;;
+esac
+
+sw_after_install
