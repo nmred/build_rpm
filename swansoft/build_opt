@@ -161,6 +161,7 @@ SRC_RSYSLOG="$TMP_DIR/`ls $TMP_DIR |grep rsyslog`"
 SRC_JSON_C="$TMP_DIR/`ls $TMP_DIR |grep json-c`"
 SRC_LIBESTR="$TMP_DIR/`ls $TMP_DIR |grep libestr`"
 SRC_RRDTOOL="$TMP_DIR/`ls $TMP_DIR |grep rrdtool`"
+SRC_RRDTOOL_PHP="$TMP_DIR/`ls $TMP_DIR |grep rrd-`"
 FIXED_BUG_DIR="$CUR_PWD/fixed_bug"
 
 # {{{ install mysql
@@ -408,6 +409,29 @@ function post_install_php()
 	eval $CMD
 	check_return_exit
 	
+	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
+		"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	make -j $CPU_NUM && make install
+	check_return_exit
+
+	# 安装 rrdtool
+	echo "Start install rrdtool ...."
+	cd $SRC_RRDTOOL_PHP
+	check_return_exit
+
+	CMD="$PATH_INSTALL/bin/phpize";
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	
+	echo "fixed config.m4 ..."
+	CMD="cp $FIXED_BUG_DIR/rrdtool/config.m4 $SRC_RRDTOOL_PHP/"
+	echo "fixed rrd.c ..."
+	CMD="cp $FIXED_BUG_DIR/rrdtool/rrd.c $SRC_RRDTOOL_PHP/"
 	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
 		"
 	echo $CMD
