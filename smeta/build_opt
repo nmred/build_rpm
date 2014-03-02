@@ -18,10 +18,10 @@
 ############################
 CPU_NUM="4"
 CUR_PWD="`pwd`"
-TMP_DIR="/tmp/swan/"
-OPENSOURCE="/usr/local/swan_open/"
+TMP_DIR="/tmp/swan/smeta"
+OPENSOURCE="/usr/local/swan_open/smeta/"
 
-SWAN_ROOT="/usr/local/swan"
+SWAN_ROOT="/usr/local/swan/smeta/"
 PATH_INSTALL="$SWAN_ROOT/opt"
 PATH_INCLUDE="$PATH_INSTALL/include"
 PATH_LIB="$PATH_INSTALL/lib"
@@ -146,7 +146,6 @@ SRC_PCRE="$TMP_DIR/`ls $TMP_DIR |grep pcre`"
 SRC_MYSQL="$TMP_DIR/`ls $TMP_DIR |grep mysql`"
 SRC_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.8`"
 SRC_PHP="$TMP_DIR/`ls $TMP_DIR |grep php`"
-SRC_GD="$TMP_DIR/`ls $TMP_DIR |grep libgd`"
 SRC_LIBXML="$TMP_DIR/`ls $TMP_DIR |grep libxml`"
 SRC_LIBXSLT="$TMP_DIR/`ls $TMP_DIR |grep libxslt`"
 SRC_LIBEVENT="$TMP_DIR/`ls $TMP_DIR |grep libevent`"
@@ -154,14 +153,13 @@ SRC_LIBCURL="$TMP_DIR/`ls $TMP_DIR |grep curl`"
 SRC_EVENTS="$TMP_DIR/`ls $TMP_DIR |grep event`"
 SRC_EIO="$TMP_DIR/`ls $TMP_DIR |grep eio`"
 SRC_DIO="$TMP_DIR/`ls $TMP_DIR |grep dio`"
-SRC_IMAGICK="$TMP_DIR/`ls $TMP_DIR |grep imagick`"
-SRC_XDEBUG="$TMP_DIR/`ls $TMP_DIR |grep xdebug`"
 SRC_PHP_REDIS="$TMP_DIR/`ls $TMP_DIR |grep redis-2\.2`"
 SRC_RSYSLOG="$TMP_DIR/`ls $TMP_DIR |grep rsyslog`"
 SRC_JSON_C="$TMP_DIR/`ls $TMP_DIR |grep json-c`"
 SRC_LIBESTR="$TMP_DIR/`ls $TMP_DIR |grep libestr`"
 SRC_RRDTOOL="$TMP_DIR/`ls $TMP_DIR |grep rrdtool`"
 SRC_RRDTOOL_PHP="$TMP_DIR/`ls $TMP_DIR |grep rrd-`"
+SRC_ZLIB="$TMP_DIR/`ls $TMP_DIR |grep zlib`"
 FIXED_BUG_DIR="$CUR_PWD/fixed_bug"
 
 # {{{ install mysql
@@ -260,6 +258,29 @@ function install_libxslt()
 }
 
 # }}}
+# {{{ function install_zlib()
+
+############################
+# 安装zlib     #############
+############################
+function install_zlib()
+{
+	echo "cd $SRC_ZLIB ..."
+	cd $SRC_ZLIB
+	check_return_exit
+
+	echo "start configure zlib ..."
+	CMD="./configure --prefix=$PATH_INSTALL"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+
+	echo "start make && make install zlib ...."
+	make -j $CPU_NUM && make install
+	check_return_exit
+}
+
+# }}}
 # {{{ function install_libevent()
 
 ############################
@@ -316,6 +337,7 @@ function install_php()
 	echo "start install php ...."
 	echo "perpare install php ..."
 	install_libxml2
+	install_zlib
 	install_libxslt
 	install_libevent
 	install_curl
@@ -335,6 +357,7 @@ function install_php()
 		--enable-shmop \
 		--enable-pcntl \
 		--with-libxml-dir=$PATH_INSTALL \
+		--with-zlib-dir=$PATH_INSTALL \
 		--enable-soap \
 		--enable-mbstring \
 		--enable-sockets \
@@ -486,6 +509,7 @@ function install_rsyslogd()
 		LDFLAGS='-L$PATH_LIB -Wl,-R$PATH_LIB' \
 	"
 	echo $CMD
+	exit;
 	eval $CMD
 	CMD="cd $SRC_LIBESTR"
 	echo $CMD
@@ -550,6 +574,7 @@ function sw_after_install()
 }
 
 # }}}
+
 case $1 in
 redis)
 	install_redis
@@ -567,11 +592,11 @@ php)
 *)
 #安装mysql
 	install_mysql
+	install_rrdtool
+	install_redis
 #安装php
 	install_php
-	install_redis
 	install_rsyslogd
-	install_rrdtool
 	exit 0
 	;;
 esac
