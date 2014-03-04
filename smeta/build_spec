@@ -39,7 +39,7 @@ class build_spec
 	 * @access protected
 	 */
 	protected $__spec_info = array(
-		'Summary'		=> 'swansoft beta',
+		'Summary'		=> 'swan smeta beta',
 		'Name'			=> SWAN_SOFTNAME,
 		'Version'		=> SWAN_VERSION,
 		'Release'		=> SWANBR_RELEASE,
@@ -51,7 +51,7 @@ class build_spec
 		'Distribution'	=> 'Open source Project',
 		'Source'        => '%{name}-%{version}.tar',
 		'Buildroot'     => '%{_tmppath}/%{name}-%{version}',
-		'Prefix'        => '/usr/local/swan',
+		'Prefix'        => '/usr/local/swan/smeta',
 		'Requires'      => 'chkconfig, sudo, nmap, libc-client',
 	);
 
@@ -256,7 +256,7 @@ else
 fi
 if test -d %{prefix}; then
 	echo ""
-	echo "Install dir \'%{prefix}\' exists. You need resolve it manually before install swansoft. Exit now."
+	echo "Install dir \'%{prefix}\' exists. You need resolve it manually before install smeta. Exit now."
 	echo ""
 # return !0 for exit.
 	test ""
@@ -341,11 +341,11 @@ EOD;
 		//nowdoc 语法
 		$preun_str = <<<'EOD'
 # stop swan_soft
-echo -n "Stop SWANSOFT ... "
+echo -n "Stop SMETA ... "
 %{prefix}/tmp_install/sbin/stop_swansoft
 echo "OK"
 # backup cron config
-mv /etc/cron.d/swan_soft /usr/local/swan/opt/etc/sw_cron.crond.backup > /dev/null 2>&1
+mv /etc/cron.d/swan_soft /usr/local/swan/smeta/opt/etc/sw_cron.crond.backup > /dev/null 2>&1
 # del initd
 /sbin/chkconfig --del swan_soft > /dev/null 2>&1
 # backup old version

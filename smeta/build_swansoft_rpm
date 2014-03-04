@@ -17,7 +17,7 @@
 # 相关配置项   #############
 ############################
 CUR_PWD=`pwd`
-PATH_DEV_SWAN=/usr/local/swan
+PATH_DEV_SWAN=/usr/local/swan/smeta
 PATH_OPT=$PATH_DEV_SWAN/opt
 PATH_WEB=$PATH_DEV_SWAN/web
 PATH_TMP_CODE=/usr/local/tmp_swansoft_git
@@ -25,7 +25,7 @@ PATH_OPT_MAKE=$PATH_TMP_CODE/opt
 
 BUILD_ROOT="/home/hzx/rpmbuild"
 GIT_SWANSOFT="/root/code/swansoft"
-SWANSOFT_NAME="swansoft"
+SWANSOFT_NAME="smeta"
 SWANSOFT_VERSION="0.2.3"
 BUILD_TMP=/tmp
 BUILD_BALL=$BUILD_TMP/$SWANSOFT_NAME-$SWANSOFT_VERSION
@@ -129,7 +129,7 @@ function sw_rm_code()
 
 function sw_make_tar()
 {
-	echo "start make swansoft tar $BUILD_BALL.tar ..."
+	echo "start make smeta tar $BUILD_BALL.tar ..."
 	echo "cd $BUILD_TMP ..."
 	cd $BUILD_TMP
 	CMD="tar -zcf $BUILD_BALL.tar $SWANSOFT_NAME-$SWANSOFT_VERSION"

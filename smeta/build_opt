@@ -21,7 +21,7 @@ CUR_PWD="`pwd`"
 TMP_DIR="/tmp/swan/smeta"
 OPENSOURCE="/usr/local/swan_open/smeta/"
 
-SWAN_ROOT="/usr/local/swan/smeta/"
+SWAN_ROOT="/usr/local/swan/smeta"
 PATH_INSTALL="$SWAN_ROOT/opt"
 PATH_INCLUDE="$PATH_INSTALL/include"
 PATH_LIB="$PATH_INSTALL/lib"
@@ -138,7 +138,7 @@ function sw_pre_install()
 
 # }}}
 
-sw_pre_install
+#sw_pre_install
 
 # 软件的源文件
 SRC_RRDTOOL="$TMP_DIR/`ls $TMP_DIR |grep rrdtool`"
@@ -316,7 +316,7 @@ function install_rrdtool()
 	check_return_exit
 
 	echo "start configure rrdtool ..."
-	CMD="./configure --prefix=$PATH_INSTALL"
+	CMD="./configure --prefix=$PATH_INSTALL --with-rrdtool=$PATH_INSTALL"
 	echo $CMD
 	eval $CMD
 	check_return_exit
@@ -455,7 +455,7 @@ function post_install_php()
 	CMD="cp $FIXED_BUG_DIR/rrdtool/config.m4 $SRC_RRDTOOL_PHP/"
 	echo "fixed rrd.c ..."
 	CMD="cp $FIXED_BUG_DIR/rrdtool/rrd.c $SRC_RRDTOOL_PHP/"
-	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config \
+	CMD="./configure --with-php-config=$PATH_INSTALL/bin/php-config --with-rrd=$PATH_INSTALL \
 		"
 	echo $CMD
 	eval $CMD
@@ -504,13 +504,6 @@ function install_rsyslogd()
 {
 	echo "start install rsyslogd ..."
 	echo "make and make install rsyslogd..."
-	CMD="CFLAGS='-I$PATH_INCLUDE ' \
-		CPPFLAGS='-I$PATH_INCLUDE' \
-		LDFLAGS='-L$PATH_LIB -Wl,-R$PATH_LIB' \
-	"
-	echo $CMD
-	exit;
-	eval $CMD
 	CMD="cd $SRC_LIBESTR"
 	echo $CMD
 	eval $CMD
@@ -537,7 +530,9 @@ function install_rsyslogd()
 	echo $CMD
 	eval $CMD
 	check_return_exit
-
+	 CFLAGS='-I/usr/local/swan/smeta//opt/include ' 
+	 CPPFLAGS='-I/usr/local/swan/smeta//opt/include' 
+	 LDFLAGS='-L/usr/local/swan/smeta//opt/lib -Wl,-R/usr/local/swan/smeta//opt/lib'
 	CMD="cd $SRC_RSYSLOG"
 	echo $CMD
 	eval $CMD
@@ -546,7 +541,7 @@ function install_rsyslogd()
 	echo $CMD
 	eval $CMD
 	check_return_exit
-	CMD="./configure --prefix=$PATH_INSTALL "
+	CMD="./configure --prefix=$PATH_INSTALL --disable-zlib "
 	echo $CMD
 	eval $CMD
 	check_return_exit
@@ -575,6 +570,8 @@ function sw_after_install()
 
 # }}}
 
+
+	exit;
 case $1 in
 redis)
 	install_redis

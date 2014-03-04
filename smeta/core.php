@@ -26,10 +26,10 @@
 // {{{ 软件详细信息
 
 // 软件名称
-define('SWAN_ROOT', '/usr/local/swan/');
+define('SWAN_ROOT', '/usr/local/swan/smeta/');
 
 // 软件名称
-define('SWAN_SOFTNAME', 'swansoft');
+define('SWAN_SOFTNAME', 'smeta');
 
 // 软件版本号
 define('SWAN_VERSION', '0.2.3');
