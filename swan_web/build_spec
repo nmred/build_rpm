@@ -1,0 +1,398 @@
+#!/usr/local/dev_swan/opt/php/bin/php
+<?php
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
+// +---------------------------------------------------------------------------
+// | SWAN [ $_SWANBR_SLOGAN_$ ]
+// +---------------------------------------------------------------------------
+// | Copyright $_SWANBR_COPYRIGHT_$
+// +---------------------------------------------------------------------------
+// | Version  $_SWANBR_VERSION_$
+// +---------------------------------------------------------------------------
+// | Licensed ( $_SWANBR_LICENSED_URL_$ )
+// +---------------------------------------------------------------------------
+// | $_SWANBR_WEB_DOMAIN_$
+// +---------------------------------------------------------------------------
+ 
+require_once 'dev_core.php';
+require_once './core.php';
+require_once PATH_DSWAN_LIB . 'iterator/sw_iterator_fetch_dir.class.php';
+
+/**
++------------------------------------------------------------------------------
+* 建立SPEC描述文件呢 
++------------------------------------------------------------------------------
+* 
+* @package 
+* @version $_SWANBR_VERSION_$
+* @copyright $_SWANBR_COPYRIGHT_$
+* @author $_SWANBR_AUTHOR_$ 
++------------------------------------------------------------------------------
+*/
+class build_spec
+{
+	// {{{ members
+	
+	/**
+	 * 生成SPEC文件配置 
+	 * 
+	 * @var array
+	 * @access protected
+	 */
+	protected $__spec_info = array(
+		'Summary'		=> 'swan web beta',
+		'Name'			=> SWAN_SOFTNAME,
+		'Version'		=> SWAN_VERSION,
+		'Release'		=> SWANBR_RELEASE,
+		'Group'			=> 'Development/Tools',
+		'License'		=> SWANBR_LICENSED_URL,
+		'URL'			=> SWANBR_WEB_DOMAIN,
+		'Vendor'		=> SWANBR_AUTHOR,
+		'Packager'		=> 'swanTeam <swansoft_team@groups.163.com>',
+		'Distribution'	=> 'Open source Project',
+		'Source'        => '%{name}-%{version}.tar',
+		'Buildroot'     => '%{_tmppath}/%{name}-%{version}',
+		'Prefix'        => '/usr/local/swan/swanweb',
+		'Requires'      => 'chkconfig, sudo, nmap',
+	);
+
+	/**
+	 * 描述文件中所有段 
+	 * 
+	 * @var array
+	 * @access protected
+	 */
+	protected $__sections = array(
+		'description' => true,
+		'prep'        => true,
+		'build'       => true,
+		'pre'         => true,
+		'install'     => true,
+		'clean'       => true,
+		'post'        => true,
+		'preun'       => true,
+		'postun'      => true,
+		'files'       => true,
+		'changelog'   => true,
+	);
+
+	/**
+	 * 软件描述 
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $__description = '';
+
+	/**
+	 * 软件预处理 
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $__prep; 
+
+	/**
+	 * 预处理宏 
+	 * 
+	 * @var string
+	 * @access protected
+	 */
+	protected $__setup;
+
+	/**
+	 * 软件构建相关处理 
+	 * 
+	 * @var mixed
+	 * @access protected
+	 */
+	protected $__build;
+
+	/**
+	 * 安装相关处理 
+	 * 
+	 * @var mixed
+	 * @access protected
+	 */
+	protected $__install;
+
+	/**
+	 * 清理相关处理 
+	 * 
+	 * @var mixed
+	 * @access protected
+	 */
+	protected $__clean;
+
+	/**
+	 * 需要打包进去的文件列表 
+	 * 
+	 * @var mixed
+	 * @access protected
+	 */
+	protected $__files;
+
+	/**
+	 * 软件修改日志 
+	 * 
+	 * @var mixed
+	 * @access protected
+	 */
+	protected $__changelog;
+
+	// }}}
+	// {{{ functions
+	// {{{ public function __construct()
+
+	public function __construct()
+	{
+	}
+
+	// }}}
+	// {{{ public function run()
+
+	public function run()
+	{
+		$string = '';
+		foreach ($this->__spec_info as $key => $value) {
+			$string .= $key . ':' . $value . PHP_EOL;
+		}
+
+		$string .= '%define debug_packages %{nil}' . PHP_EOL;
+		$string .= '%define debug_package %{nil}' . PHP_EOL;
+
+		foreach ($this->__sections as $key => $value) {
+			if (false !== $this->__sections[$key]) {
+				$string .= '%' . $key . PHP_EOL;
+				$function_name = '_set_' . $key;
+				$string .= $this->$function_name();
+				$string .= PHP_EOL;
+			}
+		}
+		
+		$spec_name = SWAN_SOFTNAME . '-' . SWAN_VERSION . '.spec';
+		if (false === file_put_contents($spec_name, $string)) {
+			throw new Exception('create spec failed. ');	
+		}
+	}
+
+	// }}}
+	// {{{ protected function _get_root_dir()
+
+	/**
+	 * 获取需要打包的软件根目录 
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _get_root_dir()
+	{
+		$soft_root = SWAN_ROOT;
+		return $soft_root;	
+	}
+
+	// }}}
+	// {{{ protected function _set_description()
+		
+	/**
+	 * 设置软件描述信息 
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_description()
+	{
+		$description  = '-------------------------------------' . PHP_EOL;
+		$description .= '- ' . SWANBR_SLOGAN . ' -' . PHP_EOL;
+		$description .= '-------------------------------------' . PHP_EOL;
+		return $description;
+	}
+
+	// }}}
+	// {{{ protected function _set_prep()
+		
+	/**
+	 * 设置预处理信息 
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_prep()
+	{
+		$string = '%setup -q';
+		return $string;	
+	}
+
+	// }}}
+	// {{{ protected function _set_build()
+		
+	/**
+	 * 设置软件构建信息 
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_build()
+	{
+		return '';	
+	}
+
+	// }}}
+	// {{{ protected function _set_pre()
+		
+	/**
+	 * 设置软件安装前执行的命令
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_pre()
+	{
+		$post_str = <<<'EOD'
+if grep -q swan /etc/passwd
+then
+	echo "Notice: Run this soft will use swan user"
+else
+	sudo adduser swan -s /sbin/nologin
+fi
+if test -d %{prefix}; then
+	echo ""
+	echo "Install dir \'%{prefix}\' exists. You need resolve it manually before install swanweb. Exit now."
+	echo ""
+# return !0 for exit.
+	test ""
+fi
+EOD;
+		return $post_str;	
+	}
+
+	// }}}
+	// {{{ protected function _set_install()
+		
+	/**
+	 * 设置软件安装处理信息 
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_install()
+	{
+		$install_str = '';
+		$install_str .= 'rm -rf $RPM_BUILD_ROOT' . PHP_EOL;
+		$install_str .= 'mkdir -p $RPM_BUILD_ROOT%{prefix}' . PHP_EOL;
+		$install_str .= 'cp -r * $RPM_BUILD_ROOT%{prefix}' .PHP_EOL;
+
+		return $install_str;
+	}
+
+	// }}}
+	// {{{ protected function _set_clean()
+		
+	/**
+	 * 设置软件清理信息处理信息 
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_clean()
+	{
+		$clean_str = '';
+		$clean_str .= 'rm -rf $RPM_BUILD_ROOT' . PHP_EOL;
+
+		return $clean_str;
+	}
+
+	// }}}
+	// {{{ protected function _set_post()
+		
+	/**
+	 * 设置软件安装完成后执行的命令
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_post()
+	{
+		$post_str = <<<EOD
+# build install
+EOD;
+		return $post_str;	
+	}
+
+	// }}}
+	// {{{ protected function _set_preun()
+		
+	/**
+	 * 准备卸载做的处理
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_preun()
+	{
+		//nowdoc 语法
+		$preun_str = <<<'EOD'
+# stop swan_soft
+#echo -n "Stop SWANWEB ... "
+#%{prefix}/tmp_install/sbin/stop_swansoft
+#echo "OK"
+# del initd
+#/sbin/chkconfig --del swan_soft > /dev/null 2>&1
+# backup old version
+SW_TMP_BAK_PATH=%{prefix}-backup-$(date +%%Y%%m%%d-%%H%%M%%S)
+mv %{prefix} $SW_TMP_BAK_PATH
+echo "Old version '%{prefix}' backup to '$SW_TMP_BAK_PATH'"
+EOD;
+		return $preun_str;	
+	}
+
+	// }}}
+	// {{{ protected function _set_postun()
+		
+	/**
+	 * 卸载后做的处理
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_postun()
+	{
+	}
+
+	// }}}
+	// {{{ protected function _set_files()
+		
+	/**
+	 * 设置软件打包文件
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_files()
+	{
+		$string = '%{prefix}' . PHP_EOL;
+		return $string;	
+	}
+
+	// }}}
+	// {{{ protected function _set_changelog()
+		
+	/**
+	 * 设置软件更新信息
+	 * 
+	 * @access protected
+	 * @return string
+	 */
+	protected function _set_changelog()
+	{
+		$change_str = file_get_contents('build_rpm.log');
+		$pattern = '/====(\d{4})-(\d{2})-(\d{2})====/eiU';
+		$replace = "'*' . date('D M d Y', mktime(0, 0, 0, \\2, \\3, \\1)) . ' ' . strtoupper(SWANBR_AUTHOR) . PHP_EOL";
+		return preg_replace($pattern, $replace, $change_str);
+	}
+
+	// }}}
+	// }}}
+}
+
+$test = new build_spec();
+$test->run();

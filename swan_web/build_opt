@@ -1,0 +1,211 @@
+#!/bin/sh
+# vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: #
+# +---------------------------------------------------------------------------
+# | SWAN [ $_SWANBR_SLOGAN_$ ]
+# +---------------------------------------------------------------------------
+# | Copyright $_SWANBR_COPYRIGHT_$
+# +---------------------------------------------------------------------------
+# | Version  $_SWANBR_VERSION_$
+# +---------------------------------------------------------------------------
+# | Licensed ( $_SWANBR_LICENSED_URL_$ )
+# +---------------------------------------------------------------------------
+# | $_SWANBR_WEB_DOMAIN_$
+# +---------------------------------------------------------------------------
+#  编译所有的开源工具到一个临时目录
+
+############################
+# 相关配置项   #############
+############################
+CPU_NUM="4"
+CUR_PWD="`pwd`"
+TMP_DIR="/tmp/swan/swanweb"
+OPENSOURCE="/usr/local/swan_open/swan_web/"
+
+SWAN_ROOT="/usr/local/swan/swanweb"
+PATH_INSTALL="$SWAN_ROOT/opt"
+PATH_INCLUDE="$PATH_INSTALL/include"
+PATH_LIB="$PATH_INSTALL/lib"
+PATH_BIN="$PATH_INSTALL/bin"
+PATH_SBIN="$PATH_INSTALL/sbin"
+ETC_DIR="$SWAN_ROOT/etc"
+
+############################
+#          函数        #####
+############################
+
+# {{{ check_return_exit()
+
+check_return_exit ()
+{
+    if ! test 0 = $?; then
+        echo -e "\n!!!!!!!!!! Error, this script will exit !!!!!!!!!!\n"
+        exit 1
+    fi
+}
+
+# }}}
+# {{{ function sw_mkdir()
+
+############################
+# 创建目录 #################
+############################
+function sw_mkdir()
+{
+	echo "create $1 directory ...";
+	if [ -d $1 ] ;then
+		echo "directory $1 already exists. " 
+	else
+		mkdir -p $1
+		check_return_exit
+	fi
+}
+
+# }}}
+# {{{ function sw_tar_all()
+
+############################
+# 通过tar解压文件 ##########
+############################
+function sw_tar_all()
+{
+	files=`ls $OPENSOURCE | grep .tar.gz`
+	for file in $files
+	do
+		if [ -d $TMP_DIR/`echo $file | sed 's/.tar.gz//'` ] ; then
+			echo "$file already extract ."
+			continue
+		fi
+		echo "start extract  $file ...";
+		tar -zxf $OPENSOURCE$file -C $TMP_DIR
+		check_return_exit
+	done
+}
+
+ # }}}
+# {{{ function sw_unzip_all()
+
+############################
+# 通过unzip解压文件 ########
+############################
+function sw_unzip_all()
+{
+	files=`ls $OPENSOURCE | grep .zip`
+	for file in $files
+	do
+		if [ -d $TMP_DIR/`echo $file | sed 's/.zip//'` ] ; then
+			echo "$file already unzip ."
+			continue
+		fi
+		echo "start unzip $file ..."
+		unzip $OPENSOURCE$file -d $TMP_DIR >/dev/null 2>&1
+		check_return_exit
+	done
+}
+
+ # }}}
+
+############################
+#  安装编译前的预处理 ######
+############################
+# {{{ function sw_pre_install()
+
+function sw_pre_install()
+{
+	if [ -d $TMP_DIR ]; then
+		echo "remove $TMP_DIR ..."
+		rm -rf $TMP_DIR
+		check_return_exit
+	fi
+	if [ -d $PATH_INSTALL ]; then
+		echo "remove $PATH_INSTALL ..."
+		rm -rf $PATH_INSTALL
+		check_return_exit
+	fi
+	echo "build install directory | extract soucre file ..."
+
+	#创建安装目录
+	sw_mkdir $PATH_INSTALL
+	sw_mkdir $PATH_INCLUDE
+	sw_mkdir $PATH_LIB
+	sw_mkdir $PATH_BIN
+	sw_mkdir $PATH_SBIN
+	sw_mkdir $TMP_DIR
+	sw_mkdir $ETC_DIR
+
+	sw_tar_all
+	sw_unzip_all
+}
+
+# }}}
+
+#sw_pre_install
+
+# 软件的源文件
+SRC_NODEJS="$TMP_DIR/`ls $TMP_DIR |grep node`"
+FIXED_BUG_DIR="$CUR_PWD/fixed_bug"
+
+# {{{ install nodejs
+# {{{ function install_nodejs()
+
+############################
+# 安装 nodejs   ##########
+############################
+function install_nodejs()
+{
+	echo "start install nodejs ..."
+	echo "make and make install nodejs..."
+	CMD="cd $SRC_NODEJS"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="./configure --prefix=$PATH_INSTALL "
+	echo $CMD
+	eval $CMD
+	check_return_exit
+	CMD="make -j $CPU_NUM && make install"
+	echo $CMD
+	eval $CMD
+	check_return_exit
+}
+
+# }}}
+# {{{ function install_npm()
+
+############################
+# 安装 npm   ##########
+############################
+function install_npm()
+{
+	cd $PATH_INSTALL/lib/
+	$PATH_INSTALL/bin/npm install express
+	$PATH_INSTALL/bin/npm install ejs
+	$PATH_INSTALL/bin/npm install forever
+	$PATH_INSTALL/bin/npm install supervisor
+	$PATH_INSTALL/bin/npm install redis
+	$PATH_INSTALL/bin/npm install socket.io
+}
+
+# }}}
+# }}}
+
+############################
+#  安装编译后的预处理 ######
+############################
+# {{{ function sw_after_install()
+
+function sw_after_install()
+{
+	if [ -d $TMP_DIR ]; then
+		echo "remove $TMP_DIR ..."
+		rm -rf $TMP_DIR
+		check_return_exit
+	fi
+}
+
+# }}}
+
+
+#install_nodejs
+install_npm
+
+sw_after_install
