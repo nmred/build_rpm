@@ -26,10 +26,10 @@
 // {{{ 软件详细信息
 
 // 软件名称
-define('SWAN_ROOT', '/usr/local/swan_mon/');
+define('SWAN_ROOT', '/usr/local/swan/smond/');
 
 // 软件名称
-define('SWAN_SOFTNAME', 'swan_mon');
+define('SWAN_SOFTNAME', 'smond');
 
 // 软件版本号
 define('SWAN_VERSION', '0.1.0');

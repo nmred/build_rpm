@@ -11,21 +11,21 @@
 # +---------------------------------------------------------------------------
 # | $_SWANBR_WEB_DOMAIN_$
 # +---------------------------------------------------------------------------
-# swan_mon 出包工具
+# smond 出包工具
 
 ############################
 # 相关配置项   #############
 ############################
 CUR_PWD=`pwd`
-PATH_DEV_SWAN=/usr/local/swan_mon
+PATH_DEV_SWAN=/usr/local/swan/smond
 PATH_OPT=$PATH_DEV_SWAN/opt
 PATH_WEB=$PATH_DEV_SWAN/web
-PATH_TMP_CODE=/usr/local/tmp_swan_mon_git
+PATH_TMP_CODE=/usr/local/tmp_smond_git
 PATH_OPT_MAKE=$PATH_TMP_CODE/opt
 
 BUILD_ROOT="/home/hzx/rpmbuild"
-GIT_SWANSOFT="/root/code/swan_mon"
-SWANSOFT_NAME="swan_mon"
+GIT_SWANSOFT="/root/code/smond"
+SWANSOFT_NAME="smond"
 SWANSOFT_VERSION="0.1.0"
 BUILD_TMP=/tmp
 BUILD_BALL=$BUILD_TMP/$SWANSOFT_NAME-$SWANSOFT_VERSION

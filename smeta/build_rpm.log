@@ -1,3 +1,13 @@
+====2014-04-01====
++ 重构监控适配器相关 API 接口
++ 添加监控中心的 server
++ 添加 gearman
++ 添加 nginx
++ 添加 redis
++ 添加 rrdtool
++ 添加 mysql
++ V0.1.0 首次 smeta.smond.swanweb 统一主版本号
+
 ====2014-01-03====
 + 和 dev_swan 软件包首次同步
 

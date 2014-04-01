@@ -32,7 +32,7 @@ define('SWAN_ROOT', '/usr/local/swan/smeta/');
 define('SWAN_SOFTNAME', 'smeta');
 
 // 软件版本号
-define('SWAN_VERSION', '0.2.3');
+define('SWAN_VERSION', '0.1.0');
 
 // 软件发行号
 define('SWANBR_RELEASE', 'beta');

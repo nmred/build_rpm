@@ -35,7 +35,7 @@ class build_tar
 	/**
 	 * 需要构建的软件目录  
 	 */
-	const SWANSOFT_GIT_DIR = '/usr/local/tmp_swan_mon_git/';
+	const SWANSOFT_GIT_DIR = '/usr/local/tmp_smond_git/';
 
 	// }}} 
 	// {{{ members

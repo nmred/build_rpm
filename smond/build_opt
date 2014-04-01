@@ -21,7 +21,8 @@ CUR_PWD="`pwd`"
 TMP_DIR="/tmp/swan/"
 OPENSOURCE="/usr/local/swan_open/"
 
-SWAN_ROOT="/usr/local/swan_mon"
+SMETA_ROOT="/usr/local/swan/smeta"
+SWAN_ROOT="/usr/local/swan/smond"
 PATH_INSTALL="$SWAN_ROOT/opt"
 PATH_INCLUDE="$PATH_INSTALL/include"
 PATH_LIB="$PATH_INSTALL/lib"
@@ -138,7 +139,7 @@ function sw_pre_install()
 
 # }}}
 
-sw_pre_install
+#sw_pre_install
 
 # 软件的源文件
 SRC_PCRE="$TMP_DIR/`ls $TMP_DIR |grep pcre`"
@@ -275,9 +276,11 @@ function install_php()
 	check_return_exit
 
 	echo "start configure php ..."
+	#--with-mysql=$SMETA_ROOT/opt/mysql \
 	CMD="
 	./configure --prefix=$PATH_INSTALL \
 		--with-config-file-path=$ETC_DIR/php \
+		--with-pdo-mysql=$SMETA_ROOT/opt/mysql \
 		--enable-ftp \
 		--with-gettext \
 		--enable-shmop \
@@ -439,6 +442,10 @@ function install_rsyslogd()
 	eval $CMD
 	check_return_exit
 
+	CFLAGS='-I/usr/local/swan/smond/opt/include ' 
+	CPPFLAGS='-I/usr/local/swan/smond/opt/include' 
+	LDFLAGS='-L/usr/local/swan/smond/opt/lib -Wl,-R/usr/local/swan/smond/opt/lib'
+	CMD="export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$PATH_LIB/pkgconfig/;./configure --prefix=$PATH_INSTALL "
 	CMD="cd $SRC_RSYSLOG"
 	echo $CMD
 	eval $CMD
@@ -475,6 +482,9 @@ function sw_after_install()
 }
 
 # }}}
+
+	install_rsyslogd
+	exit;
 case $1 in
 redis)
 	install_redis
